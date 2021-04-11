@@ -8,9 +8,77 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @OA\Schema(
+ *     title="User",
+ *     description="User model",
+ *     @OA\Xml(
+ *         name="User"
+ *     )
+ * )
+ */
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
+
+    /**
+     * @OA\Property(
+     *     title="ID",
+     *     description="ID",
+     *     format="int64",
+     *     example=1
+     * )
+     *
+     * @var integer
+     */
+    private $id;
+
+    /**
+     * @OA\Property(
+     *      title="Name",
+     *      description="Username",
+     *      example="Nguyen Van A"
+     * )
+     *
+     * @var string
+     */
+    private $name;
+
+
+
+    /**
+     * @OA\Property(
+     *      title="Password",
+     *      description="Password",
+     *      example="yourpassword"
+     * )
+     *
+     * @var string
+     */
+    private $password;
+
+    /**
+     * @OA\Property(
+     *      title="Avatar",
+     *      description="Avatar Image",
+     *      example="./avatar.ipg"
+     * )
+     *
+     * @var string
+     */
+    private $avatar;
+
+    /**
+     * @OA\Property(
+     *      title="Role",
+     *      description="Role account: default 0 - guest",
+     *      format="int64",
+     *      example="0"
+     * )
+     *
+     * @var integer
+     */
+    private $role;
 
     /**
      * The attributes that are mass assignable.

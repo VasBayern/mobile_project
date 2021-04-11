@@ -14,6 +14,59 @@ class VerificationController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *  path="/email/verify/{id}",
+     *  tags={"Authentication"},
+     *  summary="Verify Email",
+     *  operationId="verifyEmail",
+     *  description="Verify account by link received from email",
+     *  security={{"bearerAuth": {}}},
+     *
+     *  @OA\Parameter(
+     *      name="id",
+     *      in="path",
+     *      required=true,
+     *      description="id account",
+     *      @OA\Schema(
+     *           type="integer"
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="expires",
+     *      in="query",
+     *      required=true,
+     *      description="expires time of link",
+     *      @OA\Schema(
+     *           type="integer"
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="hash",
+     *      in="query",
+     *      required=true,
+     *      description="token hash",
+     *      @OA\Schema(
+     *           type="string"
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="signature",
+     *      in="query",
+     *      description="signature",
+     *      required=true,
+     *      @OA\Schema(
+     *           type="string"
+     *      )
+     *  ),
+     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=401,description="Unauthenticated"),
+     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=404,description="Not found"),
+     *  @OA\Response(response=403,description="Forbidden")
+     *)
+     **/
+
+    /**
      * Verify email
      *
      * @param $id
@@ -40,6 +93,23 @@ class VerificationController extends Controller
             'message'   => 'Email verify success!'
         ], 200);
     }
+
+    /**
+     * @OA\Get(
+     *  path="/email/resend",
+     *  tags={"Authentication"},
+     *  summary="Resend Email",
+     *  operationId="resendEmail",
+     *  description="Resend email to verify",
+     *  security={{"bearerAuth": {}}},
+     *
+     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=401,description="Unauthenticated"),
+     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=404,description="Not found"),
+     *  @OA\Response(response=403,description="Forbidden")
+     *)
+     **/
 
     /**
      * Resend email verification link

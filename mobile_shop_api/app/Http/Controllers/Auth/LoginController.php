@@ -11,6 +11,48 @@ use Illuminate\Validation\ValidationException;
 class LoginController extends Controller
 {
     /**
+     * @OA\Post(
+     *  path="/login",
+     *  tags={"Authentication"},
+     *  summary="Login",
+     *  operationId="login",
+     *  security={
+     *         {"bearerAuth": {}}
+     *      },
+     *  @OA\Parameter(
+     *      name="email",
+     *      in="query",
+     *      required=true,
+     *      @OA\Schema(
+     *           type="string"
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="password",
+     *      in="query",
+     *      required=true,
+     *      @OA\Schema(
+     *           type="string"
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="device_name",
+     *      in="query",
+     *      required=true,
+     *      @OA\Schema(
+     *           type="string",
+     *           default="Browser"
+     *      )
+     *  ),
+     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=401,description="Unauthenticated"),
+     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=404,description="Not found"),
+     *  @OA\Response(response=403,description="Forbidden")
+     *)
+     **/
+
+    /**
      * Login user
      *
      * @param  \App\Http\Requests\Auth\LoginRequest  $request
@@ -35,6 +77,22 @@ class LoginController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Post(
+     *  path="/logout",
+     *  tags={"Authentication"},
+     *  summary="Logout",
+     *  operationId="logout",
+     *  security={
+     *         {"bearerAuth": {}}
+     *     },
+     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=401,description="Unauthenticated"),
+     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=404,description="Not found"),
+     *  @OA\Response(response=403,description="Forbidden")
+     *)
+     **/
     /**
      * Logout user
      *
