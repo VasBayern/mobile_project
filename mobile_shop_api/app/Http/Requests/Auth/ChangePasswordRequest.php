@@ -4,7 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ResetPasswordRequest extends FormRequest
+class ChangePasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,6 @@ class ResetPasswordRequest extends FormRequest
      */
     protected $stopOnFirstFailure = true;
 
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -32,10 +31,9 @@ class ResetPasswordRequest extends FormRequest
     public function rules()
     {
         return [
-            'email'                 => 'required|string|email|exists:users,email',
-            'password'              => 'required|string|min:8',
-            'password_confirmation' => 'required|string|same:password',
-            'token'                 => 'required|string',
+            'old_password'          => 'required|string|min:8',
+            'new_password'          => 'required|string|min:8|different:old_password',
+            'password_confirmation' => 'required|string|same:new_password',
         ];
     }
 
@@ -47,10 +45,9 @@ class ResetPasswordRequest extends FormRequest
     public function attributes()
     {
         return [
-            'email'                 => 'Email',
-            'password'              => 'Mật khẩu',
-            'password_confirmation' => 'Mật khẩu',
-            'Token'                 => 'Token'
+            'old_password'              => 'Mật khẩu cũ',
+            'new_password'              => 'Mật khẩu mới',
+            'password_confirmation'     => 'Mật khẩu',
         ];
     }
 
@@ -64,10 +61,9 @@ class ResetPasswordRequest extends FormRequest
         return [
             'required'      => ':attribute không được bỏ trống',
             'string'        => ':attribute phải là dạng chuỗi',
-            'email'         => ':attribute không đúng định dạng',
             'min'           => ':attribute phải chứa ít nhất 8 ký tự',
             'same'          => ':attribute không khớp',
-            'exists'        => ':attribute không tồn tại',
+            'different'     => ':attribute phải khác mật khẩu cũ',
         ];
     }
 }
