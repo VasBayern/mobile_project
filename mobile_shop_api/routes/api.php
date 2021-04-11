@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\UserController;
@@ -21,9 +22,14 @@ use Illuminate\Support\Facades\Route;
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [LoginController::class, 'login']);
 
+Route::get('password/forgot', [ForgotPasswordController::class, 'forgot']);
+Route::post('password/reset', [ForgotPasswordController::class, 'reset']);
+Route::get('password/token', [ForgotPasswordController::class, 'getToken'])->name('password.reset');
+
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('user', [UserController::class, 'getUser']);
     Route::post('logout', [LoginController::class, 'logout']);
+
     Route::get('email/verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify');
     Route::get('email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
 });

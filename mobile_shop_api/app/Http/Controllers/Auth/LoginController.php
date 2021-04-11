@@ -56,7 +56,8 @@ class LoginController extends Controller
      * Login user
      *
      * @param  \App\Http\Requests\Auth\LoginRequest  $request
-     * @return response
+     * 
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function login(LoginRequest $request)
     {
@@ -97,7 +98,8 @@ class LoginController extends Controller
      * Logout user
      *
      * @param  \Illuminate\Http\Request $request
-     * @return response
+     * 
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function logout(Request $request)
     {

@@ -62,7 +62,8 @@ class RegisterController extends Controller
      * Register user
      *
      * @param  \App\Http\Requests\Auth\RegisterRequest  $request
-     * @return response
+     * 
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function register(RegisterRequest $request)
     {

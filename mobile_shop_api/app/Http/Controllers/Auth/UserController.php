@@ -26,7 +26,8 @@ class UserController extends Controller
      * Get user information
      *
      * @param  Illuminate\Http\Request $request
-     * @return response
+     * 
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getUser(Request $request)
     {
