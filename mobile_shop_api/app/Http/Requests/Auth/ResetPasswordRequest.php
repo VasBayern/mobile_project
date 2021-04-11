@@ -32,7 +32,7 @@ class ResetPasswordRequest extends FormRequest
     public function rules()
     {
         return [
-            'email'                 => 'required|string|email',
+            'email'                 => 'required|string|email|exists:users,email',
             'password'              => 'required|string|min:8',
             'password_confirmation' => 'required|string|same:password|min:8',
             'token'                 => 'required|string',
@@ -67,6 +67,7 @@ class ResetPasswordRequest extends FormRequest
             'email'         => ':attribute không đúng định dạng',
             'min'           => ':attribute phải chứa ít nhất 8 ký tự',
             'same'          => ':attribute không khớp',
+            'exists'        => ':attribute không tồn tại',
         ];
     }
 }

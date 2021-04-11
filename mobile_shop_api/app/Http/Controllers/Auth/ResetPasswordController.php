@@ -8,9 +8,9 @@ use App\Http\Requests\Auth\ResetPasswordRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 
-class ForgotPasswordController extends Controller
+class ResetPasswordController extends Controller
 {
-    /**
+   /**
      * @OA\Get(
      *  path="/password/forgot",
      *  tags={"Authentication"},

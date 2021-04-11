@@ -35,6 +35,17 @@ class User extends Authenticatable
 
     /**
      * @OA\Property(
+     *      title="Email",
+     *      description="Email",
+     *      example="admin@example.com"
+     * )
+     *
+     * @var string
+     */
+    private $email1; //$email fail send email
+
+    /**
+     * @OA\Property(
      *      title="Name",
      *      description="Username",
      *      example="Nguyen Van A"

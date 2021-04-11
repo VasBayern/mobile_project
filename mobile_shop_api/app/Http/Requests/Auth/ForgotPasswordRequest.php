@@ -24,7 +24,7 @@ class ForgotPasswordRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|string|email',
+            'email' => 'required|string|email|exists:users,email',
         ];
     }
 
@@ -51,6 +51,7 @@ class ForgotPasswordRequest extends FormRequest
             'required'      => ':attribute không được bỏ trống',
             'string'        => ':attribute phải là dạng chuỗi',
             'email'         => ':attribute không đúng định dạng',
+            'exists'        => ':attribute không tồn tại',
         ];
     }
 }
