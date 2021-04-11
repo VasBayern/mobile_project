@@ -1,4 +1,4 @@
-# mobile_shop_vue
+# Front end
 
 > A Vue.js project
 
