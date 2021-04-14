@@ -39,7 +39,8 @@ class RegisterController extends Controller
      *      in="query",
      *      required=true,
      *      @OA\Schema(
-     *           type="string"
+     *           type="string",
+     *           format="password"
      *      )
      *  ),
      *  @OA\Parameter(
@@ -47,7 +48,8 @@ class RegisterController extends Controller
      *      in="query",
      *      required=true,
      *      @OA\Schema(
-     *           type="string"
+     *           type="string",
+     *           format="password"
      *      )
      *  ),
      *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),

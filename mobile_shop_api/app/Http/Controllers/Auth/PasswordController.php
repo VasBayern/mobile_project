@@ -164,7 +164,8 @@ class PasswordController extends Controller
      *      in="query",
      *      required=true,
      *      @OA\Schema(
-     *           type="string"
+     *           type="string",
+     *           format="password"
      *      )
      *  ),
      *  @OA\Parameter(
@@ -172,7 +173,8 @@ class PasswordController extends Controller
      *      in="query",
      *      required=true,
      *      @OA\Schema(
-     *           type="string"
+     *           type="string",
+     *           format="password"
      *      )
      *  ),
      *  @OA\Parameter(
@@ -180,7 +182,8 @@ class PasswordController extends Controller
      *      in="query",
      *      required=true,
      *      @OA\Schema(
-     *           type="string"
+     *           type="string",
+     *           format="password"
      *      )
      *  ),
      *  @OA\Parameter(

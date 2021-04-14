@@ -21,7 +21,7 @@ class RegisterRequest extends FormRequest
      *
      * @var bool
      */
-    protected $stopOnFirstFailure = true;
+    protected $stopOnFirstFailure = false;
 
     /**
      * Get the validation rules that apply to the request.

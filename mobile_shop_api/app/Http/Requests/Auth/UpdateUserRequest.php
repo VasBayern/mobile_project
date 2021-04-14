@@ -4,7 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ChangePasswordRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,9 +31,11 @@ class ChangePasswordRequest extends FormRequest
     public function rules()
     {
         return [
-            'old_password'          => 'required|string|min:8',
-            'new_password'          => 'required|string|min:8|different:old_password',
-            'password_confirmation' => 'required|string|same:new_password',
+            'name'      => 'string',
+            'phone'     => 'digits:10',
+            'birthday'  => 'date_format:d/m/Y',
+            'sex'       => 'integer',    // 0: Male, 1: Femail, 2: Orther
+            'address'   => 'string|max:300',
         ];
     }
 
@@ -45,9 +47,11 @@ class ChangePasswordRequest extends FormRequest
     public function attributes()
     {
         return [
-            'old_password'              => 'Mật khẩu cũ',
-            'new_password'              => 'Mật khẩu mới',
-            'password_confirmation'     => 'Mật khẩu',
+            'name'      => 'Tên',
+            'phone'     => 'Số điện thoại',
+            'birthday'  => 'Ngày sinh',
+            'sex'       => 'Giới tính',
+            'address'   => 'Địa chỉ'
         ];
     }
 
@@ -59,11 +63,11 @@ class ChangePasswordRequest extends FormRequest
     public function messages()
     {
         return [
-            'required'      => ':attribute không được bỏ trống',
             'string'        => ':attribute phải là dạng chuỗi',
-            'min'           => ':attribute phải chứa ít nhất 8 ký tự',
-            'same'          => ':attribute không khớp',
-            'different'     => ':attribute phải khác mật khẩu cũ',
+            'date_format'   => ':attribute không đúng định dạng',
+            'integer'       => ':attribute đã chọn không đúng',
+            'max'           => ':attribute phải chứa tối đa 300 ký tự',
+            'digits'        => ':attribute phải có 10 số'
         ];
     }
 }

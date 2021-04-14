@@ -32,7 +32,8 @@
                         "in": "query",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "email"
                         }
                     },
                     {
@@ -40,7 +41,8 @@
                         "in": "query",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "password"
                         }
                     },
                     {
@@ -239,7 +241,8 @@
                         "in": "query",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "password"
                         }
                     },
                     {
@@ -247,7 +250,8 @@
                         "in": "query",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "password"
                         }
                     },
                     {
@@ -255,7 +259,8 @@
                         "in": "query",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "password"
                         }
                     },
                     {
@@ -324,7 +329,8 @@
                         "in": "query",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "password"
                         }
                     },
                     {
@@ -332,7 +338,8 @@
                         "in": "query",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "password"
                         }
                     }
                 ],
@@ -370,6 +377,94 @@
                 ],
                 "summary": "Get User",
                 "operationId": "getUser",
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/user/update": {
+            "put": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Update User",
+                "operationId": "updateUser",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "phone",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "birthday",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "sex",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": "2",
+                            "minimum": "0"
+                        }
+                    },
+                    {
+                        "name": "address",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "_method",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "PUT"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Success",

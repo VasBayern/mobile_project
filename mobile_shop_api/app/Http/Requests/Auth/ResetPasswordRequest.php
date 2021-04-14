@@ -21,7 +21,7 @@ class ResetPasswordRequest extends FormRequest
      *
      * @var bool
      */
-    protected $stopOnFirstFailure = true;
+    protected $stopOnFirstFailure = false;
 
 
     /**

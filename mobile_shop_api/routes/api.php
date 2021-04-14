@@ -28,6 +28,7 @@ Route::get('password/token', [PasswordController::class, 'getToken'])->name('pas
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('user', [UserController::class, 'getUser']);
+    Route::put('user/update', [UserController::class, 'update']);
     Route::post('logout', [LoginController::class, 'logout']);
 
     Route::get('email/verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify');
