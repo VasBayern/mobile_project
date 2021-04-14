@@ -431,6 +431,7 @@
                     {
                         "name": "birthday",
                         "in": "query",
+                        "description": "format: dd/mm/yyyy",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -440,6 +441,7 @@
                     {
                         "name": "sex",
                         "in": "query",
+                        "description": "0: Male, 1: Femail, 2: Orther",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -456,6 +458,15 @@
                         }
                     },
                     {
+                        "name": "image",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "binary"
+                        }
+                    },
+                    {
                         "name": "_method",
                         "in": "query",
                         "required": false,
@@ -465,6 +476,21 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "avatar": {
+                                        "description": "Choose a image",
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "201": {
                         "description": "Success",
@@ -637,6 +663,30 @@
                         "description": "Avatar Image",
                         "type": "string",
                         "example": "./avatar.ipg"
+                    },
+                    "phone": {
+                        "title": "Phone",
+                        "description": "Number Phone",
+                        "type": "string",
+                        "example": "0123456789"
+                    },
+                    "sex": {
+                        "title": "sex",
+                        "description": "Sex: 0:Male, 1: Female, 2: Orther",
+                        "type": "string",
+                        "example": "0"
+                    },
+                    "birthday": {
+                        "title": "Birthday",
+                        "description": "Birthday: dd/mm/yyyy",
+                        "type": "string",
+                        "example": "31/12/2021"
+                    },
+                    "address": {
+                        "title": "Address",
+                        "description": "Address",
+                        "type": "string",
+                        "example": "Cau Giay, Ha Noi"
                     },
                     "role": {
                         "title": "Role",

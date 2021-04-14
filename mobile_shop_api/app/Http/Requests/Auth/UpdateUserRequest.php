@@ -36,6 +36,7 @@ class UpdateUserRequest extends FormRequest
             'birthday'  => 'date_format:d/m/Y',
             'sex'       => 'integer',    // 0: Male, 1: Femail, 2: Orther
             'address'   => 'string|max:300',
+            'avatar'     => 'mimes:jpeg,jpg,png,gif',
         ];
     }
 
@@ -51,7 +52,8 @@ class UpdateUserRequest extends FormRequest
             'phone'     => 'Số điện thoại',
             'birthday'  => 'Ngày sinh',
             'sex'       => 'Giới tính',
-            'address'   => 'Địa chỉ'
+            'address'   => 'Địa chỉ',
+            'avatar'    => 'Ảnh đại diện'
         ];
     }
 
@@ -67,7 +69,8 @@ class UpdateUserRequest extends FormRequest
             'date_format'   => ':attribute không đúng định dạng',
             'integer'       => ':attribute đã chọn không đúng',
             'max'           => ':attribute phải chứa tối đa 300 ký tự',
-            'digits'        => ':attribute phải có 10 số'
+            'digits'        => ':attribute phải có 10 số',
+            'mimes'         => ':attribute không đúng định dạng'
         ];
     }
 }

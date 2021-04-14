@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\UpdateUserRequest;
 use App\Models\User;
-use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -51,7 +52,7 @@ class UserController extends Controller
         }
     }
 
-     /**
+    /**
      * @OA\Put(
      *  path="/user/update",
      *  tags={"Authentication"},
@@ -80,6 +81,7 @@ class UserController extends Controller
      *      name="birthday",
      *      in="query",
      *      required=false,
+     *      description="format: dd/mm/yyyy",
      *      @OA\Schema(
      *          type="string",
      *          format="date"
@@ -89,6 +91,7 @@ class UserController extends Controller
      *      name="sex",
      *      in="query",
      *      required=false,
+     *      description="0: Male, 1: Femail, 2: Orther",
      *      @OA\Schema(
      *           type="integer",
      *           minimum="0",
@@ -100,7 +103,28 @@ class UserController extends Controller
      *      in="query",
      *      required=false,
      *      @OA\Schema(
-     *           type="string"
+     *           type="string",
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="image",
+     *      in="query",
+     *      required=false,
+     *      @OA\Schema(
+     *           type="string",
+     *           format="binary"
+     *      )
+     *  ),
+     *  @OA\RequestBody(
+     *     @OA\MediaType(
+     *          mediaType="multipart/form-data",
+     *          @OA\Schema(
+     *              @OA\Property(
+     *                  property="avatar",
+     *                  type="file",
+     *                  description="Choose a image"
+     *              ),
+     *          )
      *      )
      *  ),
      *  @OA\Parameter(
@@ -120,7 +144,7 @@ class UserController extends Controller
      *  @OA\Response(response=403,description="Forbidden")
      *)
      **/
-     /**
+    /**
      * Update information
      *
      * @param App\Http\Requests\Auth\UpdateUserRequest;
@@ -146,6 +170,16 @@ class UserController extends Controller
         }
         if ($request->has('birthday')) {
             $user->birthday = DateTime::createFromFormat('d/m/Y', $request->birthday)->format('Y-m-d H:i:s');
+        }
+        if ($request->hasFile('avatar')) {
+            $imageName = $request->file('avatar')->getClientOriginalName();
+            //$imageName = Str::slug($user->name) . '.' . $request->avatar->extension();
+            $path = Storage::putFileAs(
+                'public/hinh-anh/tai-khoan/' . $user->id,
+                $request->file('avatar'),
+                $imageName
+            );
+            $user->avatar = Storage::url($path);
         }
         $user->save();
 
