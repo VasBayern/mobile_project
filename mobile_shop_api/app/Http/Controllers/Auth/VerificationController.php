@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 
 class VerificationController extends Controller
@@ -124,8 +125,7 @@ class VerificationController extends Controller
                 'message'   => 'Account has verified!'
             ], 200);
         }
-
-        auth()->user()->sendEmailVerificationNotification();
+        event(new Registered(auth()->user()));
 
         return response()->json([
             'success'   => true,

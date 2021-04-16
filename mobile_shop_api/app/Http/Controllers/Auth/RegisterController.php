@@ -5,8 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
-use Exception;
-use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
@@ -75,7 +74,7 @@ class RegisterController extends Controller
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
         $token =  $user->createToken('browser')->plainTextToken;
-        $user->sendEmailVerificationNotification();
+        event(new Registered($user));
 
         return response()->json([
             'success'       => true,
