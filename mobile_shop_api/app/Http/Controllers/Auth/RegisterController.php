@@ -13,9 +13,11 @@ class RegisterController extends Controller
      * @OA\Post(
      *  path="/register",
      *  tags={"Authentication"},
-     *  summary="Register",
+     *  summary="Register New Account",
      *  operationId="register",
-     *  security={{"bearerAuth": {}}},
+     *  security={
+     *      {"bearerAuth": {}}
+     *  },
      *
      *  @OA\Parameter(
      *      name="email",
@@ -68,8 +70,6 @@ class RegisterController extends Controller
      */
     public function register(RegisterRequest $request)
     {
-        $validated = $request->validated();
-
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
@@ -78,8 +78,9 @@ class RegisterController extends Controller
 
         return response()->json([
             'success'       => true,
-            'access_token'  => $token,
+            'message'       => 'Đăng kí thành công',
             'token_type'    => 'Bearer',
+            'access_token'  => $token,
         ], 200);
     }
 }

@@ -4,14 +4,19 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
+ * 
+ * @OA\Tag(
+ *      name="Authentication",
+ *      description="Sanctum ToKen Authen",
+ * )
  * @OA\Schema(
  *     title="User",
- *     description="User model",
  *     @OA\Xml(
  *         name="User"
  *     )
@@ -23,10 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * @OA\Property(
-     *     title="ID",
-     *     description="ID",
-     *     format="int64",
-     *     example=1
+     *     format="int64"
      * )
      *
      * @var integer
@@ -35,9 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * @OA\Property(
-     *      title="Email",
-     *      description="Email",
-     *      example="admin@example.com"
+     *      format="email"
      * )
      *
      * @var string
@@ -45,23 +45,15 @@ class User extends Authenticatable implements MustVerifyEmail
     private $email1; //$email fail send email
 
     /**
-     * @OA\Property(
-     *      title="Name",
-     *      description="Username",
-     *      example="Nguyen Van A"
-     * )
+     * @OA\Property()
      *
      * @var string
      */
     private $name;
 
-
-
     /**
      * @OA\Property(
-     *      title="Password",
-     *      description="Password",
-     *      example="yourpassword"
+     *      format="password"
      * )
      *
      * @var string
@@ -69,22 +61,14 @@ class User extends Authenticatable implements MustVerifyEmail
     private $password;
 
     /**
-     * @OA\Property(
-     *      title="Avatar",
-     *      description="Avatar Image",
-     *      example="./avatar.ipg"
-     * )
+     * @OA\Property()
      *
      * @var string
      */
     private $avatar;
 
     /**
-     * @OA\Property(
-     *      title="Phone",
-     *      description="Number Phone",
-     *      example="0123456789"
-     * )
+     * @OA\Property()
      *
      * @var string
      */
@@ -92,9 +76,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * @OA\Property(
+     *      format="int32",
      *      title="sex",
      *      description="Sex: 0:Male, 1: Female, 2: Orther",
-     *      example="0"
+     *      enum={0, 1, 2}
      * )
      *
      * @var string
@@ -103,9 +88,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * @OA\Property(
-     *      title="Birthday",
-     *      description="Birthday: dd/mm/yyyy",
-     *      example="31/12/2021"
+     *      format="date-time",
      * )
      *
      * @var string
@@ -113,11 +96,7 @@ class User extends Authenticatable implements MustVerifyEmail
     private $birthday;
 
     /**
-     * @OA\Property(
-     *      title="Address",
-     *      description="Address",
-     *      example="Cau Giay, Ha Noi"
-     * )
+     * @OA\Property()
      *
      * @var string
      */
@@ -126,10 +105,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * @OA\Property(
-     *      title="Role",
+     *      format="int32",
      *      description="Role account: default 0 - guest",
-     *      format="int64",
-     *      example="0"
+     *      enum={0, 1, 2}
      * )
      *
      * @var integer

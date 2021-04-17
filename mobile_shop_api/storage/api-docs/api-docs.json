@@ -87,7 +87,7 @@
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Logout",
+                "summary": "Logout Current User",
                 "operationId": "logout",
                 "responses": {
                     "201": {
@@ -121,7 +121,8 @@
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Forgot Pasword",
+                "summary": "Enter email to reset password",
+                "description": "Enter the registration email, then receive link reset password from email",
                 "operationId": "forgotPassword",
                 "parameters": [
                     {
@@ -166,6 +167,7 @@
                     "Authentication"
                 ],
                 "summary": "Reset Pasword",
+                "description": "Enter token from link had been sent to your email to reset password",
                 "operationId": "resetPassword",
                 "parameters": [
                     {
@@ -305,7 +307,7 @@
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Register",
+                "summary": "Register New Account",
                 "operationId": "register",
                 "parameters": [
                     {
@@ -375,7 +377,7 @@
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Get User",
+                "summary": "Get Current User Information",
                 "operationId": "getUser",
                 "responses": {
                     "201": {
@@ -405,85 +407,48 @@
             }
         },
         "/user/update": {
-            "put": {
+            "post": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Update User",
+                "summary": "Update Current User Information",
                 "operationId": "updateUser",
-                "parameters": [
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "phone",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "birthday",
-                        "in": "query",
-                        "description": "format: dd/mm/yyyy",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
-                    {
-                        "name": "sex",
-                        "in": "query",
-                        "description": "0: Male, 1: Femail, 2: Orther",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "maximum": "2",
-                            "minimum": "0"
-                        }
-                    },
-                    {
-                        "name": "address",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "image",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "format": "binary"
-                        }
-                    },
-                    {
-                        "name": "_method",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "PUT"
-                        }
-                    }
-                ],
                 "requestBody": {
                     "content": {
                         "multipart/form-data": {
                             "schema": {
                                 "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "birthday": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "sex": {
+                                        "description": "0: Male, 1: Female, 2: Orther",
+                                        "type": "integer",
+                                        "default": "0",
+                                        "maximum": "2",
+                                        "minimum": "0",
+                                        "enum": [
+                                            0,
+                                            1,
+                                            2
+                                        ]
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
                                     "avatar": {
-                                        "description": "Choose a image",
                                         "type": "file"
+                                    },
+                                    "_method": {
+                                        "type": "string",
+                                        "default": "PUT"
                                     }
                                 },
                                 "type": "object"
@@ -518,13 +483,58 @@
                 ]
             }
         },
+        "/user/destroy/{id}": {
+            "delete": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Delete User Account By ID",
+                "description": "Permission: Admin",
+                "operationId": "destroyUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/email/verify/{id}": {
             "get": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Verify Email",
-                "description": "Verify account by link received from email",
+                "summary": "Verify Email After Register",
+                "description": "Verify account by link had been received from email",
                 "operationId": "verifyEmail",
                 "parameters": [
                     {
@@ -596,8 +606,7 @@
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Resend Email",
-                "description": "Resend email to verify",
+                "summary": "Resend Email To Verify",
                 "operationId": "resendEmail",
                 "responses": {
                     "201": {
@@ -631,69 +640,55 @@
         "schemas": {
             "User": {
                 "title": "User",
-                "description": "User model",
                 "properties": {
                     "id": {
-                        "title": "ID",
-                        "description": "ID",
                         "type": "integer",
-                        "format": "int64",
-                        "example": 1
+                        "format": "int64"
                     },
                     "email1": {
-                        "title": "Email",
-                        "description": "Email",
                         "type": "string",
-                        "example": "admin@example.com"
+                        "format": "email"
                     },
                     "name": {
-                        "title": "Name",
-                        "description": "Username",
-                        "type": "string",
-                        "example": "Nguyen Van A"
+                        "type": "string"
                     },
                     "password": {
-                        "title": "Password",
-                        "description": "Password",
                         "type": "string",
-                        "example": "yourpassword"
+                        "format": "password"
                     },
                     "avatar": {
-                        "title": "Avatar",
-                        "description": "Avatar Image",
-                        "type": "string",
-                        "example": "./avatar.ipg"
+                        "type": "string"
                     },
                     "phone": {
-                        "title": "Phone",
-                        "description": "Number Phone",
-                        "type": "string",
-                        "example": "0123456789"
+                        "type": "string"
                     },
                     "sex": {
                         "title": "sex",
                         "description": "Sex: 0:Male, 1: Female, 2: Orther",
                         "type": "string",
-                        "example": "0"
+                        "format": "int32",
+                        "enum": [
+                            0,
+                            1,
+                            2
+                        ]
                     },
                     "birthday": {
-                        "title": "Birthday",
-                        "description": "Birthday: dd/mm/yyyy",
                         "type": "string",
-                        "example": "31/12/2021"
+                        "format": "date-time"
                     },
                     "address": {
-                        "title": "Address",
-                        "description": "Address",
-                        "type": "string",
-                        "example": "Cau Giay, Ha Noi"
+                        "type": "string"
                     },
                     "role": {
-                        "title": "Role",
                         "description": "Role account: default 0 - guest",
                         "type": "integer",
-                        "format": "int64",
-                        "example": "0"
+                        "format": "int32",
+                        "enum": [
+                            0,
+                            1,
+                            2
+                        ]
                     }
                 },
                 "type": "object",
@@ -712,6 +707,12 @@
             }
         }
     },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Sanctum ToKen Authen"
+        }
+    ],
     "security": [
         []
     ]

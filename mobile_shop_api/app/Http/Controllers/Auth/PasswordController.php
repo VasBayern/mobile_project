@@ -18,11 +18,12 @@ class PasswordController extends Controller
      * @OA\Get(
      *  path="/password/forgot",
      *  tags={"Authentication"},
-     *  summary="Forgot Pasword",
+     *  summary="Enter email to reset password",
+     *  description="Enter the registration email, then receive link reset password from email",
      *  operationId="forgotPassword",
      *  security={
-     *         {"bearerAuth": {}}
-     *      },
+     *      {"bearerAuth": {}}
+     *  },
      *  @OA\Parameter(
      *      name="email",
      *      in="query",
@@ -52,7 +53,7 @@ class PasswordController extends Controller
 
         return response()->json([
             'success'   => true,
-            'message'   => 'Reset password link sent on your email!'
+            'message'   => 'Mã đặt lại mật khẩu đã được gửi tới email của bạn!'
         ], 200);
     }
 
@@ -79,10 +80,11 @@ class PasswordController extends Controller
      *  path="/password/reset",
      *  tags={"Authentication"},
      *  summary="Reset Pasword",
+     *  description="Enter token from link had been sent to your email to reset password",
      *  operationId="resetPassword",
      *  security={
-     *         {"bearerAuth": {}}
-     *      },
+     *      {"bearerAuth": {}}
+     *  },
      *  @OA\Parameter(
      *      name="email",
      *      in="query",
@@ -124,7 +126,7 @@ class PasswordController extends Controller
      *)
      **/
     /**
-     * Forgot password
+     * Reset password
      *
      * @param  \App\Http\Requests\Auth\ResetPasswordRequest
      * 
@@ -140,13 +142,13 @@ class PasswordController extends Controller
         if ($resetPasswordStatus == Password::INVALID_TOKEN) {
             return response()->json([
                 'success'   => true,
-                'message'   => 'Token is invalid!'
+                'message'   => 'Mã Token không chính xác!'
             ], 401);
         }
 
         return response()->json([
             'success'   => true,
-            'message'   => 'Password has been successfully changed!'
+            'message'   => 'Thay đổi mật khẩu thành công!'
         ], 200);
     }
 
@@ -157,8 +159,8 @@ class PasswordController extends Controller
      *  summary="Change Pasword",
      *  operationId="changePassword",
      *  security={
-     *         {"bearerAuth": {}}
-     *      },
+     *      {"bearerAuth": {}}
+     *  },
      *  @OA\Parameter(
      *      name="old_password",
      *      in="query",
@@ -213,20 +215,18 @@ class PasswordController extends Controller
 
     public function change(ChangePasswordRequest $request)
     {
-        $validated = $request->validated();
-
         $user = Auth::user();
         if (!Hash::check($request->old_password, $user->password)) {
             return response()->json([
                 'success'   => false,
-                'message'   => 'Old password is incorrect!'
+                'message'   => 'Mật khẩu hiện tại không đúng!'
             ]);
         }
         User::where('id', $user->id)->update(['password' => bcrypt($request->new_password)]);
 
         return response()->json([
             'success'   => true,
-            'message'   => 'Password has been successfully changed!'
+            'message'   => 'Thay đổi mật khẩu thành công!'
         ]);
     }
 }

@@ -18,10 +18,12 @@ class VerificationController extends Controller
      * @OA\Get(
      *  path="/email/verify/{id}",
      *  tags={"Authentication"},
-     *  summary="Verify Email",
+     *  summary="Verify Email After Register",
      *  operationId="verifyEmail",
-     *  description="Verify account by link received from email",
-     *  security={{"bearerAuth": {}}},
+     *  description="Verify account by link had been received from email",
+     *  security={
+     *      {"bearerAuth": {}}
+     *  },
      *
      *  @OA\Parameter(
      *      name="id",
@@ -70,7 +72,7 @@ class VerificationController extends Controller
     /**
      * Verify email
      *
-     * @param $id
+     * @param integer $id
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -79,7 +81,7 @@ class VerificationController extends Controller
         if (!$request->hasValidSignature()) {
             return response()->json([
                 'success'   => false,
-                'message'   => 'Signature is invalid!'
+                'message'   => 'Xác thực không thành công!'
             ], 401);
         }
 
@@ -91,7 +93,7 @@ class VerificationController extends Controller
 
         return response()->json([
             'success'   => true,
-            'message'   => 'Email verify success!'
+            'message'   => 'Xác thực thành công!'
         ], 200);
     }
 
@@ -99,10 +101,11 @@ class VerificationController extends Controller
      * @OA\Get(
      *  path="/email/resend",
      *  tags={"Authentication"},
-     *  summary="Resend Email",
+     *  summary="Resend Email To Verify",
      *  operationId="resendEmail",
-     *  description="Resend email to verify",
-     *  security={{"bearerAuth": {}}},
+     *  security={
+     *      {"bearerAuth": {}}
+     *  },
      *
      *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
@@ -122,14 +125,14 @@ class VerificationController extends Controller
         if (auth()->user()->hasVerifiedEmail()) {
             return response()->json([
                 'success'   => false,
-                'message'   => 'Account has verified!'
+                'message'   => 'Tài khoản đã xác thực từ trước!'
             ], 200);
         }
         event(new Registered(auth()->user()));
 
         return response()->json([
             'success'   => true,
-            'message'   => 'Email sent!'
+            'message'   => 'Đã gửi email xác thực!'
         ], 200);
     }
 }

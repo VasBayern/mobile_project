@@ -17,8 +17,8 @@ class LoginController extends Controller
      *  summary="Login",
      *  operationId="login",
      *  security={
-     *         {"bearerAuth": {}}
-     *      },
+     *      {"bearerAuth": {}}
+     *  },
      *  @OA\Parameter(
      *      name="email",
      *      in="query",
@@ -63,8 +63,6 @@ class LoginController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $validated = $request->validated();
-
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
@@ -75,6 +73,7 @@ class LoginController extends Controller
 
         return response()->json([
             'success'       => true,
+            'message'       => 'Đăng nhập thành công',
             'token_type'    => 'Bearer',
             'access_token'  => $token,
         ], 200);
@@ -84,11 +83,11 @@ class LoginController extends Controller
      * @OA\Post(
      *  path="/logout",
      *  tags={"Authentication"},
-     *  summary="Logout",
+     *  summary="Logout Current User",
      *  operationId="logout",
      *  security={
-     *         {"bearerAuth": {}}
-     *     },
+     *      {"bearerAuth": {}}
+     *  },
      *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
      *  @OA\Response(response=400,description="Bad Request"),
@@ -109,7 +108,7 @@ class LoginController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Logout success'
+            'message' => 'Đăng xuất thành công!'
         ], 200);
     }
 }
