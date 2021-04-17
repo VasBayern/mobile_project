@@ -625,75 +625,362 @@
                     }
                 ]
             }
+        },
+        "/categories": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get All Category",
+                "operationId": "getCategories",
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Add Category With Form Data",
+                "operationId": "storeCategory",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "home",
+                                    "sort_no",
+                                    "image"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "sort_no": {
+                                        "type": "integer",
+                                        "default": "0"
+                                    },
+                                    "home": {
+                                        "description": "0: False, 1: True",
+                                        "type": "integer",
+                                        "default": "0",
+                                        "maximum": "1",
+                                        "minimum": "0"
+                                    },
+                                    "image": {
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Find Category By ID",
+                "operationId": "showCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Update Category With Form Data",
+                "operationId": "updateCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "home",
+                                    "sort_no",
+                                    "_method"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "sort_no": {
+                                        "type": "integer",
+                                        "default": "0"
+                                    },
+                                    "home": {
+                                        "description": "0: False, 1: True",
+                                        "type": "integer",
+                                        "default": "0",
+                                        "maximum": "1",
+                                        "minimum": "0"
+                                    },
+                                    "_method": {
+                                        "type": "string",
+                                        "default": "PUT"
+                                    },
+                                    "image": {
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Delete Category By ID",
+                "operationId": "destroyCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
         "schemas": {
-            "User": {
-                "title": "User",
-                "description": "User model",
+            "Category": {
+                "title": "Category",
                 "properties": {
                     "id": {
-                        "title": "ID",
-                        "description": "ID",
                         "type": "integer",
-                        "format": "int64",
-                        "example": 1
-                    },
-                    "email1": {
-                        "title": "Email",
-                        "description": "Email",
-                        "type": "string",
-                        "example": "admin@example.com"
+                        "format": "int64"
                     },
                     "name": {
-                        "title": "Name",
-                        "description": "Username",
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "image": {
+                        "type": "string"
+                    },
+                    "sort_no": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "home": {
+                        "description": "Show in homepage => 0: False, 1: True",
+                        "type": "integer",
+                        "format": "int32",
+                        "enum": [
+                            0,
+                            1
+                        ]
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "Category"
+                }
+            },
+            "User": {
+                "title": "User",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "email1": {
                         "type": "string",
-                        "example": "Nguyen Van A"
+                        "format": "email"
+                    },
+                    "name": {
+                        "type": "string"
                     },
                     "password": {
-                        "title": "Password",
-                        "description": "Password",
                         "type": "string",
-                        "example": "yourpassword"
+                        "format": "password"
                     },
                     "avatar": {
-                        "title": "Avatar",
-                        "description": "Avatar Image",
-                        "type": "string",
-                        "example": "./avatar.ipg"
+                        "type": "string"
                     },
                     "phone": {
-                        "title": "Phone",
-                        "description": "Number Phone",
-                        "type": "string",
-                        "example": "0123456789"
+                        "type": "string"
                     },
                     "sex": {
                         "title": "sex",
                         "description": "Sex: 0:Male, 1: Female, 2: Orther",
                         "type": "string",
-                        "example": "0"
+                        "format": "int32",
+                        "enum": [
+                            0,
+                            1,
+                            2
+                        ]
                     },
                     "birthday": {
-                        "title": "Birthday",
-                        "description": "Birthday: dd/mm/yyyy",
                         "type": "string",
-                        "example": "31/12/2021"
+                        "format": "date-time"
                     },
                     "address": {
-                        "title": "Address",
-                        "description": "Address",
-                        "type": "string",
-                        "example": "Cau Giay, Ha Noi"
+                        "type": "string"
                     },
                     "role": {
-                        "title": "Role",
                         "description": "Role account: default 0 - guest",
                         "type": "integer",
-                        "format": "int64",
-                        "example": "0"
+                        "format": "int32",
+                        "enum": [
+                            0,
+                            1,
+                            2
+                        ]
                     }
                 },
                 "type": "object",
@@ -712,6 +999,16 @@
             }
         }
     },
+    "tags": [
+        {
+            "name": "Category",
+            "description": "Category Information Of Project"
+        },
+        {
+            "name": "Authentication",
+            "description": "Sanctum ToKen Authen"
+        }
+    ],
     "security": [
         []
     ]
