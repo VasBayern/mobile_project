@@ -25,11 +25,14 @@ class UserController extends Controller
      *      {"bearerAuth": {}}
      *  },
      *
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(
+     *      response=200,
+     *      description="Success",
+     *      @OA\JsonContent(
+     *          @OA\Property(property="data", type="object", ref="#/components/schemas/User"),
+     *      )
+     *  ),      
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
      *)
      **/
     /**
@@ -102,11 +105,17 @@ class UserController extends Controller
      *      )
      *  ),
      * 
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
-     *  @OA\Response(response=401,description="Unauthenticated"),
+     *  @OA\Response(
+     *      response=201,
+     *      description="Success",
+     *      @OA\JsonContent(
+     *          @OA\Property(property="data", type="object", ref="#/components/schemas/User"),
+     *      )
+     *  ),     
      *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
+     *  @OA\Response(response=401,description="Unauthenticated"),
+     * @OA\Response(response=405,description="Method not allow"),
+     *  @OA\Response(response=422,description="Unprocessable entity"),
      *)
      **/
     /**
@@ -174,13 +183,13 @@ class UserController extends Controller
                 'success'   => true,
                 'message'   => 'Cập nhật thành công!',
                 'data'      => $user
-            ]);
+            ], 201);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success'   => false,
                 'message'   => $e->getMessage()
-            ]);
+            ], 422);
         }
     }
 
@@ -204,11 +213,9 @@ class UserController extends Controller
      *      )
      *  ),
      *
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
+     *  @OA\Response(response=404,description="Not Found"),
      *)
      **/
     /**
@@ -228,12 +235,12 @@ class UserController extends Controller
             return response()->json([
                 'success'   => true,
                 'message'   => 'Xóa thành công'
-            ]);
+            ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'success'   => false,
                 'message'   => $e->getMessage()
-            ]);
+            ], 404);
         }
     }
 }

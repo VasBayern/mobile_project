@@ -61,11 +61,9 @@ class VerificationController extends Controller
      *           type="string"
      *      )
      *  ),
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
+     *  @OA\Response(response=422,description="Unprocessable entity"),
      *)
      **/
 
@@ -82,7 +80,7 @@ class VerificationController extends Controller
             return response()->json([
                 'success'   => false,
                 'message'   => 'Xác thực không thành công!'
-            ], 401);
+            ], 422);
         }
 
         $user = User::findOrFail($id);
@@ -107,11 +105,9 @@ class VerificationController extends Controller
      *      {"bearerAuth": {}}
      *  },
      *
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
+     *  @OA\Response(response=422,description="Unprocessable entity"),
      *)
      **/
 
@@ -126,7 +122,7 @@ class VerificationController extends Controller
             return response()->json([
                 'success'   => false,
                 'message'   => 'Tài khoản đã xác thực từ trước!'
-            ], 200);
+            ], 422);
         }
         event(new Registered(auth()->user()));
 

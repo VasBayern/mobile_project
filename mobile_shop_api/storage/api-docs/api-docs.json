@@ -26,53 +26,47 @@
                 ],
                 "summary": "Login",
                 "operationId": "login",
-                "parameters": [
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "email"
-                        }
-                    },
-                    {
-                        "name": "password",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "password"
-                        }
-                    },
-                    {
-                        "name": "device_name",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "default": "Browser"
+                "requestBody": {
+                    "description": "Register Form",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password",
+                                    "device_name"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    },
+                                    "device_name": {
+                                        "type": "string",
+                                        "example": "browser"
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
                             "application/json": {}
                         }
                     },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
+                    "422": {
+                        "description": "Unprocessable entity"
                     }
                 },
                 "security": [
@@ -90,7 +84,7 @@
                 "summary": "Logout Current User",
                 "operationId": "logout",
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
                             "application/json": {}
@@ -98,15 +92,6 @@
                     },
                     "401": {
                         "description": "Unauthenticated"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
                     }
                 },
                 "security": [
@@ -135,23 +120,14 @@
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
                             "application/json": {}
                         }
                     },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
                     "404": {
                         "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
                     }
                 },
                 "security": [
@@ -169,58 +145,51 @@
                 "summary": "Reset Pasword",
                 "description": "Enter token from link had been sent to your email to reset password",
                 "operationId": "resetPassword",
-                "parameters": [
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "password",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "password_confirmation",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "token",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@gmail.com"
+                                    },
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
                             "application/json": {}
                         }
                     },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
+                    "422": {
+                        "description": "Unprocessable entity"
                     }
                 },
                 "security": [
@@ -237,46 +206,41 @@
                 ],
                 "summary": "Change Pasword",
                 "operationId": "changePassword",
-                "parameters": [
-                    {
-                        "name": "old_password",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "password"
-                        }
-                    },
-                    {
-                        "name": "new_password",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "password"
-                        }
-                    },
-                    {
-                        "name": "password_confirmation",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "password"
-                        }
-                    },
-                    {
-                        "name": "_method",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "default": "PATCH"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "token",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "old_password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    },
+                                    "new_password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "123456789"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "123456789"
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
                             "application/json": {}
@@ -285,14 +249,8 @@
                     "401": {
                         "description": "Unauthenticated"
                     },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
+                    "422": {
+                        "description": "Unprocessable entity"
                     }
                 },
                 "security": [
@@ -309,42 +267,44 @@
                 ],
                 "summary": "Register New Account",
                 "operationId": "register",
-                "parameters": [
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "password",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "password"
-                        }
-                    },
-                    {
-                        "name": "password_confirmation",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "password"
+                "requestBody": {
+                    "description": "Register Form",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "name",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@gmail.com"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nguyen Van A"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "201": {
                         "description": "Success",
@@ -352,17 +312,8 @@
                             "application/json": {}
                         }
                     },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
+                    "422": {
+                        "description": "Unprocessable entity"
                     }
                 },
                 "security": [
@@ -380,23 +331,23 @@
                 "summary": "Get Current User Information",
                 "operationId": "getUser",
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
-                            "application/json": {}
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
                         }
                     },
                     "401": {
                         "description": "Unauthenticated"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
                     }
                 },
                 "security": [
@@ -460,20 +411,29 @@
                     "201": {
                         "description": "Success",
                         "content": {
-                            "application/json": {}
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
                         }
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
                     },
                     "400": {
                         "description": "Bad Request"
                     },
-                    "404": {
-                        "description": "Not found"
+                    "401": {
+                        "description": "Unauthenticated"
                     },
-                    "403": {
-                        "description": "Forbidden"
+                    "405": {
+                        "description": "Method not allow"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity"
                     }
                 },
                 "security": [
@@ -502,7 +462,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
                             "application/json": {}
@@ -511,14 +471,8 @@
                     "401": {
                         "description": "Unauthenticated"
                     },
-                    "400": {
-                        "description": "Bad Request"
-                    },
                     "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
+                        "description": "Not Found"
                     }
                 },
                 "security": [
@@ -575,7 +529,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
                             "application/json": {}
@@ -584,14 +538,8 @@
                     "401": {
                         "description": "Unauthenticated"
                     },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
+                    "422": {
+                        "description": "Unprocessable entity"
                     }
                 },
                 "security": [
@@ -609,7 +557,7 @@
                 "summary": "Resend Email To Verify",
                 "operationId": "resendEmail",
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
                             "application/json": {}
@@ -618,14 +566,8 @@
                     "401": {
                         "description": "Unauthenticated"
                     },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
+                    "422": {
+                        "description": "Unprocessable entity"
                     }
                 },
                 "security": [
@@ -639,13 +581,15 @@
     "components": {
         "schemas": {
             "User": {
-                "title": "User",
+                "required": [
+                    "password"
+                ],
                 "properties": {
                     "id": {
                         "type": "integer",
                         "format": "int64"
                     },
-                    "email1": {
+                    "email": {
                         "type": "string",
                         "format": "email"
                     },
@@ -660,13 +604,13 @@
                         "type": "string"
                     },
                     "phone": {
-                        "type": "string"
+                        "type": "string",
+                        "maxLength": 10,
+                        "minLength": 10
                     },
                     "sex": {
-                        "title": "sex",
-                        "description": "Sex: 0:Male, 1: Female, 2: Orther",
-                        "type": "string",
-                        "format": "int32",
+                        "description": "Sex: 0: Male, 1: Female, 2: Orther",
+                        "type": "integer",
                         "enum": [
                             0,
                             1,
@@ -674,6 +618,7 @@
                         ]
                     },
                     "birthday": {
+                        "description": "Birthday: dd/mm/yyyy",
                         "type": "string",
                         "format": "date-time"
                     },
@@ -681,9 +626,8 @@
                         "type": "string"
                     },
                     "role": {
-                        "description": "Role account: default 0 - guest",
+                        "description": "Role: 0: User, 1: Admin, 2: Staff",
                         "type": "integer",
-                        "format": "int32",
                         "enum": [
                             0,
                             1,

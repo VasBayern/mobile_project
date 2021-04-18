@@ -16,103 +16,23 @@ use Laravel\Sanctum\HasApiTokens;
  *      description="Sanctum ToKen Authen",
  * )
  * @OA\Schema(
- *     title="User",
- *     @OA\Xml(
- *         name="User"
- *     )
+ *      required={"password"},
+ *      @OA\Xml(name="User"),
+ *      @OA\Property(property="id", type="integer", format="int64"),
+ *      @OA\Property(property="email", type="string", format="email"),
+ *      @OA\Property(property="name", type="string"),
+ *      @OA\Property(property="password", type="string", format="password"),
+ *      @OA\Property(property="avatar", type="string"),
+ *      @OA\Property(property="phone", type="string", minLength=10, maxLength=10),
+ *      @OA\Property(property="sex", type="integer", enum={0,1,2}, description="Sex: 0: Male, 1: Female, 2: Orther"),
+ *      @OA\Property(property="birthday", type="string", format="date-time", description="Birthday: dd/mm/yyyy"),
+ *      @OA\Property(property="address", type="string"),
+ *      @OA\Property(property="role", type="integer", enum={0,1,2}, description="Role: 0: User, 1: Admin, 2: Staff"),
  * )
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, HasApiTokens;
-
-    /**
-     * @OA\Property(
-     *     format="int64"
-     * )
-     *
-     * @var integer
-     */
-    private $id;
-
-    /**
-     * @OA\Property(
-     *      format="email"
-     * )
-     *
-     * @var string
-     */
-    private $email1; //$email fail send email
-
-    /**
-     * @OA\Property()
-     *
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @OA\Property(
-     *      format="password"
-     * )
-     *
-     * @var string
-     */
-    private $password;
-
-    /**
-     * @OA\Property()
-     *
-     * @var string
-     */
-    private $avatar;
-
-    /**
-     * @OA\Property()
-     *
-     * @var string
-     */
-    private $phone;
-
-    /**
-     * @OA\Property(
-     *      format="int32",
-     *      title="sex",
-     *      description="Sex: 0:Male, 1: Female, 2: Orther",
-     *      enum={0, 1, 2}
-     * )
-     *
-     * @var string
-     */
-    private $sex;
-
-    /**
-     * @OA\Property(
-     *      format="date-time",
-     * )
-     *
-     * @var string
-     */
-    private $birthday;
-
-    /**
-     * @OA\Property()
-     *
-     * @var string
-     */
-    private $address;
-
-
-    /**
-     * @OA\Property(
-     *      format="int32",
-     *      description="Role account: default 0 - guest",
-     *      enum={0, 1, 2}
-     * )
-     *
-     * @var integer
-     */
-    private $role;
 
     /**
      * The attributes that are mass assignable.
