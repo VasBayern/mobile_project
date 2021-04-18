@@ -633,24 +633,82 @@
                 ],
                 "summary": "Get All Category",
                 "operationId": "getCategories",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "sort by column: 0-id, 1-name, 2-sort_no, 3-home, 4-image",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort by order: 0-ASC, 1-DESC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "sort by paginate page: 10, 25, 50, 100",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "10",
+                            "enum": [
+                                10,
+                                25,
+                                50,
+                                100
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "search by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
-                            "application/json": {}
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Category"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
                         }
                     },
                     "401": {
                         "description": "Unauthenticated"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
                     }
                 },
                 "security": [
@@ -684,11 +742,13 @@
                                         "default": "0"
                                     },
                                     "home": {
-                                        "description": "0: False, 1: True",
+                                        "description": "Show in homepage => 0: False, 1: True",
                                         "type": "integer",
                                         "default": "0",
-                                        "maximum": "1",
-                                        "minimum": "0"
+                                        "enum": [
+                                            0,
+                                            1
+                                        ]
                                     },
                                     "image": {
                                         "type": "file"
@@ -703,20 +763,26 @@
                     "201": {
                         "description": "Success",
                         "content": {
-                            "application/json": {}
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Category"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
                         }
                     },
                     "401": {
                         "description": "Unauthenticated"
                     },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
                     "403": {
                         "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity"
                     }
                 },
                 "security": [
@@ -744,23 +810,26 @@
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Success",
                         "content": {
-                            "application/json": {}
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Category"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
                         }
                     },
                     "401": {
                         "description": "Unauthenticated"
                     },
-                    "400": {
-                        "description": "Bad Request"
-                    },
                     "404": {
-                        "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
+                        "description": "Not Found"
                     }
                 },
                 "security": [
@@ -804,18 +873,19 @@
                                         "default": "0"
                                     },
                                     "home": {
-                                        "description": "0: False, 1: True",
+                                        "description": "Show in homepage => 0: False, 1: True",
                                         "type": "integer",
-                                        "default": "0",
-                                        "maximum": "1",
-                                        "minimum": "0"
+                                        "enum": [
+                                            0,
+                                            1
+                                        ]
+                                    },
+                                    "image": {
+                                        "type": "file"
                                     },
                                     "_method": {
                                         "type": "string",
                                         "default": "PUT"
-                                    },
-                                    "image": {
-                                        "type": "file"
                                     }
                                 },
                                 "type": "object"
@@ -827,20 +897,32 @@
                     "201": {
                         "description": "Success",
                         "content": {
-                            "application/json": {}
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Category"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
                         }
                     },
                     "401": {
                         "description": "Unauthenticated"
                     },
-                    "400": {
-                        "description": "Bad Request"
+                    "403": {
+                        "description": "Forbidden"
                     },
                     "404": {
                         "description": "Not found"
                     },
-                    "403": {
-                        "description": "Forbidden"
+                    "405": {
+                        "description": "Method not allow"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity"
                     }
                 },
                 "security": [
@@ -866,23 +948,17 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {}
-                        }
+                    "200": {
+                        "description": "Success"
                     },
                     "401": {
                         "description": "Unauthenticated"
                     },
-                    "400": {
-                        "description": "Bad Request"
+                    "403": {
+                        "description": "Forbidden"
                     },
                     "404": {
                         "description": "Not found"
-                    },
-                    "403": {
-                        "description": "Forbidden"
                     }
                 },
                 "security": [
@@ -900,29 +976,29 @@
                 "properties": {
                     "id": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "example": "1"
                     },
                     "name": {
-                        "type": "string"
-                    },
-                    "slug": {
-                        "type": "string"
-                    },
-                    "image": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "Điện thoại"
                     },
                     "sort_no": {
                         "type": "integer",
-                        "format": "int32"
+                        "example": "1"
                     },
                     "home": {
                         "description": "Show in homepage => 0: False, 1: True",
                         "type": "integer",
-                        "format": "int32",
                         "enum": [
                             0,
                             1
-                        ]
+                        ],
+                        "example": "0"
+                    },
+                    "image": {
+                        "type": "string",
+                        "example": "dien-thoai.png"
                     }
                 },
                 "type": "object",
@@ -932,55 +1008,69 @@
             },
             "User": {
                 "title": "User",
+                "description": "User model",
                 "properties": {
                     "id": {
+                        "title": "ID",
+                        "description": "ID",
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "example": 1
                     },
                     "email1": {
+                        "title": "Email",
+                        "description": "Email",
                         "type": "string",
-                        "format": "email"
+                        "example": "admin@example.com"
                     },
                     "name": {
-                        "type": "string"
+                        "title": "Name",
+                        "description": "Username",
+                        "type": "string",
+                        "example": "Nguyen Van A"
                     },
                     "password": {
+                        "title": "Password",
+                        "description": "Password",
                         "type": "string",
-                        "format": "password"
+                        "example": "yourpassword"
                     },
                     "avatar": {
-                        "type": "string"
+                        "title": "Avatar",
+                        "description": "Avatar Image",
+                        "type": "string",
+                        "example": "./avatar.ipg"
                     },
                     "phone": {
-                        "type": "string"
+                        "title": "Phone",
+                        "description": "Number Phone",
+                        "type": "string",
+                        "example": "0123456789"
                     },
                     "sex": {
                         "title": "sex",
                         "description": "Sex: 0:Male, 1: Female, 2: Orther",
                         "type": "string",
-                        "format": "int32",
-                        "enum": [
-                            0,
-                            1,
-                            2
-                        ]
+                        "example": "0"
                     },
                     "birthday": {
+                        "title": "Birthday",
+                        "description": "Birthday: dd/mm/yyyy",
                         "type": "string",
-                        "format": "date-time"
+                        "example": "31/12/2021"
                     },
                     "address": {
-                        "type": "string"
+                        "title": "Address",
+                        "description": "Address",
+                        "type": "string",
+                        "example": "Cau Giay, Ha Noi"
                     },
                     "role": {
+                        "title": "Role",
                         "description": "Role account: default 0 - guest",
                         "type": "integer",
-                        "format": "int32",
-                        "enum": [
-                            0,
-                            1,
-                            2
-                        ]
+                        "format": "int64",
+                        "example": "0"
                     }
                 },
                 "type": "object",
@@ -1003,10 +1093,6 @@
         {
             "name": "Category",
             "description": "Category Information Of Project"
-        },
-        {
-            "name": "Authentication",
-            "description": "Sanctum ToKen Authen"
         }
     ],
     "security": [

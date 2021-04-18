@@ -8,7 +8,7 @@ use App\Http\Resources\CategoryDetailResource;
 use App\Models\Category;
 use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -26,26 +26,91 @@ class CategoryController extends Controller
      *  security={
      *      {"bearerAuth": {}}
      *  },
-     * 
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Parameter(
+     *      name="sort", 
+     *      in="query", 
+     *      required=true, 
+     *      description="sort by column: 0-id, 1-name, 2-sort_no, 3-home, 4-image", 
+     *      @OA\Schema(type="integer", default="0", enum={0,1,2,3,4})
+     *  ),
+     *  @OA\Parameter(
+     *      name="order", 
+     *      in="query", 
+     *      required=true, 
+     *      description="sort by order: 0-ASC, 1-DESC", 
+     *      @OA\Schema(type="integer", default="0", enum={0,1})
+     *  ),
+     *  @OA\Parameter(
+     *      name="per_page", 
+     *      in="query", 
+     *      required=true, 
+     *      description="sort by paginate page: 10, 25, 50, 100", 
+     *      @OA\Schema(type="integer", default="10", enum={10,25,50,100})
+     *  ),
+     *  @OA\Parameter(
+     *      name="search", 
+     *      in="query", 
+     *      required=false,
+     *      description="search by name", 
+     *      @OA\Schema(type="string")
+     *  ),
+     *  @OA\Response(
+     *     response=200,
+     *     description="Success",
+     *     @OA\JsonContent(
+     *        @OA\Property(property="data", type="object", ref="#/components/schemas/Category"),
+     *     )
+     *  ),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
      *)
      **/
     /**
      * Display a listing of the resource.
-     *
+     * @param  \Illuminate\Http\Request $request
+     * 
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::when(request('search'), function ($query) {
-            $query->where('name', 'like', '%' . request('search') . '%');
-        })->orderBy('sort_no', 'asc')->paginate(10);
+        try {
+            $page = $request->all();
 
-        return CategoryDetailResource::collection($categories)->response()->getData(true);
+            $search = isset($page['search']) ? $page['search'] : '';
+            $perPage = $page['per_page'];
+            $sortOrder = ($page['order'] == 1) ? 'DESC' : 'ASC';
+            $sortColumn = '';
+            switch ($page['sort']) {
+                case 0:
+                    $sortColumn = 'id';
+                    break;
+                case 1:
+                    $sortColumn = 'name';
+                    break;
+                case 2:
+                    $sortColumn = 'sort_no';
+                    break;
+                case 3:
+                    $sortColumn = 'home';
+                    break;
+                case 4:
+                    $sortColumn = 'image';
+                    break;
+                default:
+                    throw new Exception("Không tìm thấy trường này");
+                    break;
+            }
+
+            $categories = Category::when($search, function ($query, $search) {
+                $query->where('name', 'LIKE', '%' . $search . '%');
+            })->orderBy($sortColumn, $sortOrder)->paginate($perPage);
+
+            return CategoryDetailResource::collection($categories)->response()->getData(true);
+        } catch (Exception $e) {
+            return response()->json([
+                'success'   => false,
+                'message'   => $e->getMessage()
+            ], 422);
+        }
     }
 
     /**
@@ -63,36 +128,23 @@ class CategoryController extends Controller
      *          mediaType="multipart/form-data",
      *          @OA\Schema(
      *              required={"name", "home", "sort_no", "image"},
-     *              @OA\Property(
-     *                  property="name",
-     *                  type="string",
-     *              ),
-     *              @OA\Property(
-     *                  property="sort_no",
-     *                  type="integer",
-     *                  default="0",
-     *              ),
-     *              @OA\Property(
-     *                  property="home",
-     *                  type="integer",
-     *                  default="0",
-     *                  minimum="0",
-     *                  maximum="1",
-     *                  description="0: False, 1: True",
-     *              ),
-     *              @OA\Property(
-     *                  property="image",
-     *                  type="file",
-     *              ),
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="sort_no", type="integer", default="0"),
+     *              @OA\Property(property="home", type="integer", default="0", enum={0, 1}, description="Show in homepage => 0: False, 1: True",),
+     *              @OA\Property(property="image", type="file",),
      *          )
      *      )
      *  ),
-     * 
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(
+     *      response=201,
+     *      description="Success",
+     *      @OA\JsonContent(
+     *          @OA\Property(property="data", type="object", ref="#/components/schemas/Category"),
+     *      )
+     *  ),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
+     *  @OA\Response(response=403,description="Forbidden"),
+     *  @OA\Response(response=422,description="Unprocessable entity"),
      *)
      **/
     /**
@@ -119,7 +171,7 @@ class CategoryController extends Controller
             'succees'   => true,
             'message'   => "Thêm thành công!",
             'data'      => new CategoryDetailResource($category)
-        ]);
+        ], 201);
     }
 
     /**
@@ -136,16 +188,18 @@ class CategoryController extends Controller
      *      name="id",
      *      in="path",
      *      required=true,
-     *      @OA\Schema(
-     *          type="integer",
-     *      )
+     *      @OA\Schema(type="integer")
      *  ),
      * 
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(
+     *      response=200,
+     *      description="Success",
+     *      @OA\JsonContent(
+     *          @OA\Property(property="data", type="object", ref="#/components/schemas/Category"),
+     *      )
+     *  ),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
+     *  @OA\Response(response=404,description="Not Found"),
      *)
      **/
     /**
@@ -162,12 +216,12 @@ class CategoryController extends Controller
             return response()->json([
                 'success'   => true,
                 'data'      => new CategoryDetailResource($category)
-            ]);
+            ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'success'   => false,
                 'message'   => $e->getMessage()
-            ]);
+            ], 404);
         }
     }
 
@@ -194,41 +248,26 @@ class CategoryController extends Controller
      *          mediaType="multipart/form-data",
      *          @OA\Schema(
      *              required={"name", "home", "sort_no", "_method"},
-     *              @OA\Property(
-     *                  property="name",
-     *                  type="string",
-     *              ),
-     *              @OA\Property(
-     *                  property="sort_no",
-     *                  type="integer",
-     *                  default="0",
-     *              ),
-     *              @OA\Property(
-     *                  property="home",
-     *                  type="integer",
-     *                  default="0",
-     *                  minimum="0",
-     *                  maximum="1",
-     *                  description="0: False, 1: True",
-     *              ),
-     *              @OA\Property(
-     *                  property="_method",
-     *                  type="string",
-     *                  default="PUT",
-     *              ),
-     *              @OA\Property(
-     *                  property="image",
-     *                  type="file",
-     *              ),
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="sort_no", type="integer", default="0"),
+     *              @OA\Property(property="home", type="integer", enum={0, 1}, description="Show in homepage => 0: False, 1: True"),
+     *              @OA\Property(property="image", type="file"),
+     *              @OA\Property(property="_method", type="string", default="PUT"),
      *          )
      *      )
      *  ),
-     * 
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(
+     *      response=201,
+     *      description="Success",
+     *      @OA\JsonContent(
+     *          @OA\Property(property="data", type="object", ref="#/components/schemas/Category"),
+     *      )
+     *  ),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=403,description="Forbidden"),
      *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
+     *  @OA\Response(response=405,description="Method not allow"),
+     *  @OA\Response(response=422,description="Unprocessable entity"),
      *)
      */
     /**
@@ -273,13 +312,13 @@ class CategoryController extends Controller
                 'status'    => true,
                 'message'   => 'Sửa thành công',
                 'data'      => new CategoryDetailResource($category)
-            ]);
+            ], 201);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success'   => false,
                 'message'   => $e->getMessage()
-            ]);
+            ], 404);
         }
     }
 
@@ -297,16 +336,13 @@ class CategoryController extends Controller
      *      name="id",
      *      in="path",
      *      required=true,
-     *      @OA\Schema(
-     *          type="integer",
-     *      )
+     *      @OA\Schema(type="integer")
      *  ),
      * 
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=200,description="Success"),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=403,description="Forbidden"),
      *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
      *)
      **/
     /**
@@ -329,12 +365,12 @@ class CategoryController extends Controller
             return response()->json([
                 'success'   => true,
                 'message'   => 'Xóa thành công'
-            ]);
+            ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'success'   => false,
                 'message'   => $e->getMessage()
-            ]);
+            ], 404);
         }
     }
 }

@@ -12,65 +12,18 @@ use Illuminate\Database\Eloquent\Model;
  *      description="Category Information Of Project",
  * )
  * @OA\Schema(
- *     title="Category",
- *     @OA\Xml(
- *         name="Category"
- *     )
+ *      title="Category",
+ *      @OA\Xml(name="Category"),
+ *      @OA\Property(property="id", type="integer", format="int64", example="1"),
+ *      @OA\Property(property="name", type="string", example="Điện thoại"),
+ *      @OA\Property(property="sort_no", type="integer", example="1"),
+ *      @OA\Property(property="home", type="integer", example="0", enum={0,1}, description="Show in homepage => 0: False, 1: True",),
+ *      @OA\Property(property="image", type="string", example="dien-thoai.png"),
  * )
  */
 class Category extends Model
 {
     use HasFactory, setSlugTrait;
-
-    /**
-     * @OA\Property(
-     *     format="int64",
-     * )
-     *
-     * @var integer
-     */
-    private $id;
-
-    /**
-     * @OA\Property()
-     *
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @OA\Property()
-     *
-     * @var string
-     */
-    private $slug;
-
-    /**
-     * @OA\Property()
-     *
-     * @var string
-     */
-    private $image;
-
-    /**
-     * @OA\Property(
-     *      format="int32",
-     * )
-     *
-     * @var integer
-     */
-    private $sort_no;
-
-    /**
-     * @OA\Property(
-     *      format="int32",
-     *      description="Show in homepage => 0: False, 1: True",
-     *      enum={0,1}
-     * )
-     *
-     * @var integer
-     */
-    private $home;
 
     /**
      * The table associated with the model.
