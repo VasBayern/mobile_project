@@ -6,15 +6,15 @@ use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Http\Resources\CategoryDetailResource;
 use App\Models\Category;
+use App\Traits\ApiResponseTrait;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
-/**
-
- */
 class CategoryController extends Controller
 {
+    use ApiResponseTrait;
     /**
      * @OA\Get(
      *  path="/categories",
@@ -33,6 +33,7 @@ class CategoryController extends Controller
      *        @OA\Property(property="data", type="object", ref="#/components/schemas/Category"),
      *     )
      *  ),
+     *  @OA\Response(response=400,description="Bad Request"),
      *  @OA\Response(response=401,description="Unauthenticated"),
      *)
      **/
@@ -40,7 +41,7 @@ class CategoryController extends Controller
      * Display a listing of the resource.
      * @param  \Illuminate\Http\Request $request
      * 
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
@@ -48,12 +49,9 @@ class CategoryController extends Controller
             $page = $request->all();
             $categories = Category::getCategoryWithOrder($page);
 
-            return CategoryDetailResource::collection($categories)->response()->getData(true);
-        } catch (Exception $e) {
-            return response()->json([
-                'success'   => false,
-                'message'   => $e->getMessage()
-            ], 422);
+            return $this->respondWithResourceCollection(CategoryDetailResource::collection($categories));
+        } catch (Exception $exception) {
+            return $this->respondError('Điều kiện không chính xác', 400, $exception);
         }
     }
 
@@ -93,19 +91,15 @@ class CategoryController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\Category\StoreCategoryRequest $request
-     * @return \Illuminate\Http\Response
+     * 
+     * @return JsonResponse
      */
     public function store(StoreCategoryRequest $request)
     {
         $category = Category::create($request->all());
         $category->image = Category::handleUploadImage($category->id, $request->name, $request->image);
         $category->save();
-
-        return response()->json([
-            'succees'   => true,
-            'message'   => "Thêm thành công!",
-            'data'      => new CategoryDetailResource($category)
-        ], 201);
+        return $this->respondWithResource(new CategoryDetailResource($category), 'Thêm thành công', 201);
     }
 
     /**
@@ -132,22 +126,16 @@ class CategoryController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * 
+     * @return JsonResponse
      */
     public function show($id)
     {
         try {
             $category = Category::findOrFail($id);
-
-            return response()->json([
-                'success'   => true,
-                'data'      => new CategoryDetailResource($category)
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'success'   => false,
-                'message'   => $e->getMessage()
-            ], 404);
+            return $this->respondWithResource(new CategoryDetailResource($category));
+        } catch (Exception $exception) {
+            return $this->respondError('ID không tồn tại!', 404, $exception);
         }
     }
 
@@ -192,7 +180,8 @@ class CategoryController extends Controller
      *
      * @param  \App\Http\Requests\Category\UpdateCategoryRequest $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * 
+     * @return JsonResponse
      */
     public function update(UpdateCategoryRequest $request, $id)
     {
@@ -213,17 +202,11 @@ class CategoryController extends Controller
                 $category->save();
             }
             DB::commit();
-            return response()->json([
-                'status'    => true,
-                'message'   => 'Sửa thành công',
-                'data'      => new CategoryDetailResource($category)
-            ], 200);
-        } catch (Exception $e) {
+
+            return $this->respondWithResource(new CategoryDetailResource($category), 'Sửa thành công', 200);
+        } catch (Exception $exception) {
             DB::rollBack();
-            return response()->json([
-                'success'   => false,
-                'message'   => $e->getMessage()
-            ], 404);
+            return $this->respondError('Có lỗi xảy ra. Vui lòng thử lại!', 400, $exception);
         }
     }
 
@@ -247,25 +230,19 @@ class CategoryController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * 
+     * @return JsonResponse
      */
     public function destroy($id)
     {
         try {
             $category = Category::findOrFail($id);
             Category::removeImageDirectory($id);
-
             $category->delete();
 
-            return response()->json([
-                'success'   => true,
-                'message'   => 'Xóa thành công'
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'success'   => false,
-                'message'   => $e->getMessage()
-            ], 404);
+            return $this->respondSuccess('Xoá thành công');
+        } catch (Exception $exception) {
+            return $this->respondError('ID không tồn tại!', 404, $exception);
         }
     }
 }

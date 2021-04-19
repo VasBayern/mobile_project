@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Resources\Json\Resource;
 
 trait ApiResponseTrait
 {
@@ -23,9 +24,7 @@ trait ApiResponseTrait
     {
         $result = $this->parseGivenData($data, $statusCode, $headers);
 
-        return response()->json([
-            $result['content'], $result['statusCode'], $result['headers']
-        ]);
+        return response()->json($result['content'], $result['statusCode'], $result['headers']);
     }
 
     /**
@@ -41,7 +40,6 @@ trait ApiResponseTrait
         $responseStructure = [
             'success'   => $data['success'],
             'message'   => $data['message'] ?? null,
-            'result'    => $data['result'] ?? null,
         ];
 
         if (isset($data['errors'])) {
@@ -70,10 +68,11 @@ trait ApiResponseTrait
 
         if ($data['success'] === false) {
             if (isset($data['error_code'])) {
-                $responseStructure['error_code'] = $data['error_code'];
+                // $responseStructure['error_code'] = $data['error_code'];
             }
         } else {
-            $responseStructure['error_code'] = 1;
+            $responseStructure['data'] = $data['data'] ?? null;
+            // $responseStructure['error_code'] = 1;
         }
 
         return [
@@ -84,6 +83,31 @@ trait ApiResponseTrait
     }
 
     /**
+     * Response with single resource
+     * 
+     * @param Resource $resource
+     * @param null $message
+     * @param int $statusCode
+     * @param array $headers
+     * 
+     * @return JsonResponse
+     */
+    protected function respondWithResource($resource, $message = null, $statusCode = 200, $headers = [])
+    {
+        return $this->apiResponse(
+            [
+                'success'   => true,
+                'message'   => $message,
+                'data'      => $resource
+            ],
+            $statusCode,
+            $headers
+        );
+    }
+
+    /**
+     * Response with resource collection pagination page
+     * 
      * @param ResourceCollection $resourceCollection
      * @param null $message
      * @param int $statusCode
@@ -91,14 +115,14 @@ trait ApiResponseTrait
      * 
      * @return JsonResponse
      */
-    protected function respondWithResourceCollection(ResourceCollection $resourceCollection, $message = null, $statusCode = 200, $headers = [])
+    protected function respondWithResourceCollection($resourceCollection, $message = null, $statusCode = 200, $headers = [])
     {
         // https://laracasts.com/discuss/channels/laravel/pagination-data-missing-from-api-resource
 
         return $this->apiResponse(
             [
                 'success'   => true,
-                'result'    => $resourceCollection->response()->getData(true)
+                'data'      => $resourceCollection->response()->getData(true)
             ],
             $statusCode,
             $headers
@@ -109,6 +133,9 @@ trait ApiResponseTrait
      * Respone with error.
      *
      * @param string $message
+     * @param int $statusCode
+     * @param Exception $exception
+     * @param int $error_code
      *
      * @return JsonResponse
      */
@@ -117,7 +144,7 @@ trait ApiResponseTrait
         return $this->apiResponse(
             [
                 'success'       => false,
-                'message'       => $message ?? 'There was an internal error, Please try again later!',
+                'message'       => $message ?? 'Có lỗi trên máy chủ. Vui lòng thử lại sau!',
                 'exception'     => $exception,
                 'error_code'    => $error_code
             ],
@@ -132,14 +159,14 @@ trait ApiResponseTrait
      *
      * @return JsonResponse
      */
-    protected function respondSuccess($message = '')
+    protected function respondSuccess($message = null)
     {
         return $this->apiResponse(['success' => true, 'message' => $message]);
     }
 
     /**
      * Respone with created.
-     *
+     * 
      * @param string $message
      *
      * @return JsonResponse
@@ -189,7 +216,7 @@ trait ApiResponseTrait
      * Respone with not found.
      *
      * @param string $message
-     *
+     * 
      * @return JsonResponse
      */
     protected function respondNotFound($message = 'Not Found')
