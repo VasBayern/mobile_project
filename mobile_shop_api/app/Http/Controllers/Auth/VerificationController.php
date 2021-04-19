@@ -18,12 +18,10 @@ class VerificationController extends Controller
      * @OA\Get(
      *  path="/email/verify/{id}",
      *  tags={"Authentication"},
-     *  summary="Verify Email After Register",
+     *  summary="Verify Email",
      *  operationId="verifyEmail",
-     *  description="Verify account by link had been received from email",
-     *  security={
-     *      {"bearerAuth": {}}
-     *  },
+     *  description="Verify account by link received from email",
+     *  security={{"bearerAuth": {}}},
      *
      *  @OA\Parameter(
      *      name="id",
@@ -61,16 +59,18 @@ class VerificationController extends Controller
      *           type="string"
      *      )
      *  ),
-     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=422,description="Unprocessable entity"),
+     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=404,description="Not found"),
+     *  @OA\Response(response=403,description="Forbidden")
      *)
      **/
 
     /**
      * Verify email
      *
-     * @param integer $id
+     * @param $id
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -79,8 +79,8 @@ class VerificationController extends Controller
         if (!$request->hasValidSignature()) {
             return response()->json([
                 'success'   => false,
-                'message'   => 'Xác thực không thành công!'
-            ], 422);
+                'message'   => 'Signature is invalid!'
+            ], 401);
         }
 
         $user = User::findOrFail($id);
@@ -91,7 +91,7 @@ class VerificationController extends Controller
 
         return response()->json([
             'success'   => true,
-            'message'   => 'Xác thực thành công!'
+            'message'   => 'Email verify success!'
         ], 200);
     }
 
@@ -99,15 +99,16 @@ class VerificationController extends Controller
      * @OA\Get(
      *  path="/email/resend",
      *  tags={"Authentication"},
-     *  summary="Resend Email To Verify",
+     *  summary="Resend Email",
      *  operationId="resendEmail",
-     *  security={
-     *      {"bearerAuth": {}}
-     *  },
+     *  description="Resend email to verify",
+     *  security={{"bearerAuth": {}}},
      *
-     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=422,description="Unprocessable entity"),
+     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=404,description="Not found"),
+     *  @OA\Response(response=403,description="Forbidden")
      *)
      **/
 
@@ -121,14 +122,14 @@ class VerificationController extends Controller
         if (auth()->user()->hasVerifiedEmail()) {
             return response()->json([
                 'success'   => false,
-                'message'   => 'Tài khoản đã xác thực từ trước!'
-            ], 422);
+                'message'   => 'Account has verified!'
+            ], 200);
         }
         event(new Registered(auth()->user()));
 
         return response()->json([
             'success'   => true,
-            'message'   => 'Đã gửi email xác thực!'
+            'message'   => 'Email sent!'
         ], 200);
     }
 }
