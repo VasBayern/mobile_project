@@ -18,12 +18,11 @@ class PasswordController extends Controller
      * @OA\Get(
      *  path="/password/forgot",
      *  tags={"Authentication"},
-     *  summary="Enter email to reset password",
-     *  description="Enter the registration email, then receive link reset password from email",
+     *  summary="Forgot Pasword",
      *  operationId="forgotPassword",
      *  security={
-     *      {"bearerAuth": {}}
-     *  },
+     *         {"bearerAuth": {}}
+     *      },
      *  @OA\Parameter(
      *      name="email",
      *      in="query",
@@ -32,8 +31,11 @@ class PasswordController extends Controller
      *           type="string"
      *      )
      *  ),
-     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=401,description="Unauthenticated"),
+     *  @OA\Response(response=400,description="Bad Request"),
      *  @OA\Response(response=404,description="Not found"),
+     *  @OA\Response(response=403,description="Forbidden")
      *)
      **/
     /**
@@ -50,7 +52,7 @@ class PasswordController extends Controller
 
         return response()->json([
             'success'   => true,
-            'message'   => 'Mã đặt lại mật khẩu đã được gửi tới email của bạn!'
+            'message'   => 'Reset password link sent on your email!'
         ], 200);
     }
 
@@ -77,27 +79,52 @@ class PasswordController extends Controller
      *  path="/password/reset",
      *  tags={"Authentication"},
      *  summary="Reset Pasword",
-     *  description="Enter token from link had been sent to your email to reset password",
      *  operationId="resetPassword",
      *  security={
-     *      {"bearerAuth": {}}
-     *  },
-     *  @OA\RequestBody(
+     *         {"bearerAuth": {}}
+     *      },
+     *  @OA\Parameter(
+     *      name="email",
+     *      in="query",
      *      required=true,
-     *      @OA\JsonContent(
-     *          required={"email", "token", "password", "password_confirmation"},
-     *          @OA\Property(property="email", type="string", format="email", example="user@gmail.com"),
-     *          @OA\Property(property="token", type="string"),
-     *          @OA\Property(property="password", type="string", format="password", example="12345678"),
-     *          @OA\Property(property="password_confirmation", type="string", format="password", example="12345678"),
-     *      ),
+     *      @OA\Schema(
+     *           type="string"
+     *      )
      *  ),
-     *  @OA\Response(response=200,description="Success", @OA\MediaType( mediaType="application/json",)),
-     *  @OA\Response(response=422,description="Unprocessable entity"),
+     *  @OA\Parameter(
+     *      name="token",
+     *      in="query",
+     *      required=true,
+     *      @OA\Schema(
+     *           type="string"
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="password",
+     *      in="query",
+     *      required=true,
+     *      @OA\Schema(
+     *           type="string"
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="password_confirmation",
+     *      in="query",
+     *      required=true,
+     *      @OA\Schema(
+     *           type="string"
+     *      )
+     *  ),
+     * 
+     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=401,description="Unauthenticated"),
+     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=404,description="Not found"),
+     *  @OA\Response(response=403,description="Forbidden")
      *)
      **/
     /**
-     * Reset password
+     * Forgot password
      *
      * @param  \App\Http\Requests\Auth\ResetPasswordRequest
      * 
@@ -113,13 +140,13 @@ class PasswordController extends Controller
         if ($resetPasswordStatus == Password::INVALID_TOKEN) {
             return response()->json([
                 'success'   => true,
-                'message'   => 'Mã Token không chính xác!'
-            ], 422);
+                'message'   => 'Token is invalid!'
+            ], 401);
         }
 
         return response()->json([
             'success'   => true,
-            'message'   => 'Thay đổi mật khẩu thành công!'
+            'message'   => 'Password has been successfully changed!'
         ], 200);
     }
 
@@ -130,22 +157,50 @@ class PasswordController extends Controller
      *  summary="Change Pasword",
      *  operationId="changePassword",
      *  security={
-     *      {"bearerAuth": {}}
-     *  },
-     * 
-     *  @OA\RequestBody(
+     *         {"bearerAuth": {}}
+     *      },
+     *  @OA\Parameter(
+     *      name="old_password",
+     *      in="query",
      *      required=true,
-     *      @OA\JsonContent(
-     *          required={"email", "token", "password", "password_confirmation"},
-     *          @OA\Property(property="old_password", type="string", format="password", example="12345678"),
-     *          @OA\Property(property="new_password", type="string", format="password", example="123456789"),
-     *          @OA\Property(property="password_confirmation", type="string", format="password", example="123456789"),
-     *      ),
+     *      @OA\Schema(
+     *           type="string",
+     *           format="password"
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="new_password",
+     *      in="query",
+     *      required=true,
+     *      @OA\Schema(
+     *           type="string",
+     *           format="password"
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="password_confirmation",
+     *      in="query",
+     *      required=true,
+     *      @OA\Schema(
+     *           type="string",
+     *           format="password"
+     *      )
+     *  ),
+     *  @OA\Parameter(
+     *      name="_method",
+     *      in="query",
+     *      required=true,
+     *      @OA\Schema(
+     *          type="string",
+     *          default="PATCH"
+     *      )
      *  ),
      * 
-     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=422,description="Unprocessable entity"),
+     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=404,description="Not found"),
+     *  @OA\Response(response=403,description="Forbidden")
      *)
      **/
     /**
@@ -158,18 +213,20 @@ class PasswordController extends Controller
 
     public function change(ChangePasswordRequest $request)
     {
+        $validated = $request->validated();
+
         $user = Auth::user();
         if (!Hash::check($request->old_password, $user->password)) {
             return response()->json([
                 'success'   => false,
-                'message'   => 'Mật khẩu hiện tại không đúng!'
-            ], 422);
+                'message'   => 'Old password is incorrect!'
+            ]);
         }
         User::where('id', $user->id)->update(['password' => bcrypt($request->new_password)]);
 
         return response()->json([
             'success'   => true,
-            'message'   => 'Thay đổi mật khẩu thành công!'
-        ], 200);
+            'message'   => 'Password has been successfully changed!'
+        ]);
     }
 }
