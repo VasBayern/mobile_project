@@ -17,40 +17,21 @@ class LoginController extends Controller
      *  summary="Login",
      *  operationId="login",
      *  security={
-     *         {"bearerAuth": {}}
-     *      },
-     *  @OA\Parameter(
-     *      name="email",
-     *      in="query",
+     *      {"bearerAuth": {}}
+     *  },
+     *  @OA\RequestBody(
      *      required=true,
-     *      @OA\Schema(
-     *           type="string",
-     *           format="email"
-     *      )
+     *      description="Register Form",
+     *      @OA\JsonContent(
+     *          required={"email", "password", "device_name"},
+     *          @OA\Property(property="email", type="string", format="email", example="user@gmail.com"),
+     *          @OA\Property(property="password", type="string", format="password", example="12345678"),
+     *          @OA\Property(property="device_name", type="string", example="browser"),
+     *      ),
      *  ),
-     *  @OA\Parameter(
-     *      name="password",
-     *      in="query",
-     *      required=true,
-     *      @OA\Schema(
-     *           type="string",
-     *           format="password"
-     *      )
-     *  ),
-     *  @OA\Parameter(
-     *      name="device_name",
-     *      in="query",
-     *      required=true,
-     *      @OA\Schema(
-     *           type="string",
-     *           default="Browser"
-     *      )
-     *  ),
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
-     *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
+     * 
+     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=422,description="Unprocessable entity"),
      *)
      **/
 
@@ -63,8 +44,6 @@ class LoginController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $validated = $request->validated();
-
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
@@ -75,6 +54,7 @@ class LoginController extends Controller
 
         return response()->json([
             'success'       => true,
+            'message'       => 'Đăng nhập thành công',
             'token_type'    => 'Bearer',
             'access_token'  => $token,
         ], 200);
@@ -84,16 +64,13 @@ class LoginController extends Controller
      * @OA\Post(
      *  path="/logout",
      *  tags={"Authentication"},
-     *  summary="Logout",
+     *  summary="Logout Current User",
      *  operationId="logout",
      *  security={
-     *         {"bearerAuth": {}}
-     *     },
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *      {"bearerAuth": {}}
+     *  },
+     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
      *)
      **/
     /**
@@ -109,7 +86,7 @@ class LoginController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Logout success'
+            'message' => 'Đăng xuất thành công!'
         ], 200);
     }
 }
