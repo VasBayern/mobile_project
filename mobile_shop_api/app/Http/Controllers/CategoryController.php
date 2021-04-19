@@ -9,8 +9,6 @@ use App\Models\Category;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 /**
 
@@ -26,37 +24,11 @@ class CategoryController extends Controller
      *  security={
      *      {"bearerAuth": {}}
      *  },
-     *  @OA\Parameter(
-     *      name="sort", 
-     *      in="query", 
-     *      required=true, 
-     *      description="sort by column: 0-id, 1-name, 2-sort_no, 3-home, 4-image", 
-     *      @OA\Schema(type="integer", default="0", enum={0,1,2,3,4})
-     *  ),
-     *  @OA\Parameter(
-     *      name="order", 
-     *      in="query", 
-     *      required=true, 
-     *      description="sort by order: 0-ASC, 1-DESC", 
-     *      @OA\Schema(type="integer", default="0", enum={0,1})
-     *  ),
-     *  @OA\Parameter(
-     *      name="per_page", 
-     *      in="query", 
-     *      required=true, 
-     *      description="sort by paginate page: 10, 25, 50, 100", 
-     *      @OA\Schema(type="integer", default="10", enum={10,25,50,100})
-     *  ),
-     *  @OA\Parameter(
-     *      name="search", 
-     *      in="query", 
-     *      required=false,
-     *      description="search by name", 
-     *      @OA\Schema(type="string")
-     *  ),
-     *  @OA\Response(
-     *     response=200,
-     *     description="Success",
+     *  @OA\Parameter(name="sort", in="query", required=true, description="sort by column: 0-id, 1-name, 2-sort_no, 3-home, 4-image", @OA\Schema(type="integer", default="0", enum={0,1,2,3,4})),
+     *  @OA\Parameter(name="order", in="query", required=true, description="sort by order: 0-ASC, 1-DESC", @OA\Schema(type="integer", default="0", enum={0,1})),
+     *  @OA\Parameter(name="per_page", in="query", required=true, description="sort by paginate page: 10, 25, 50, 100", @OA\Schema(type="integer", default="10", enum={10,25,50,100})),
+     *  @OA\Parameter(name="search", in="query", required=false, description="search by name", @OA\Schema(type="string")),
+     *  @OA\Response(response=200, description="Success",
      *     @OA\JsonContent(
      *        @OA\Property(property="data", type="object", ref="#/components/schemas/Category"),
      *     )
@@ -74,35 +46,7 @@ class CategoryController extends Controller
     {
         try {
             $page = $request->all();
-
-            $search = isset($page['search']) ? $page['search'] : '';
-            $perPage = $page['per_page'];
-            $sortOrder = ($page['order'] == 1) ? 'DESC' : 'ASC';
-            $sortColumn = '';
-            switch ($page['sort']) {
-                case 0:
-                    $sortColumn = 'id';
-                    break;
-                case 1:
-                    $sortColumn = 'name';
-                    break;
-                case 2:
-                    $sortColumn = 'sort_no';
-                    break;
-                case 3:
-                    $sortColumn = 'home';
-                    break;
-                case 4:
-                    $sortColumn = 'image';
-                    break;
-                default:
-                    throw new Exception("Không tìm thấy trường này");
-                    break;
-            }
-
-            $categories = Category::when($search, function ($query, $search) {
-                $query->where('name', 'LIKE', '%' . $search . '%');
-            })->orderBy($sortColumn, $sortOrder)->paginate($perPage);
+            $categories = Category::getCategoryWithOrder($page);
 
             return CategoryDetailResource::collection($categories)->response()->getData(true);
         } catch (Exception $e) {
@@ -135,9 +79,7 @@ class CategoryController extends Controller
      *          )
      *      )
      *  ),
-     *  @OA\Response(
-     *      response=201,
-     *      description="Success",
+     *  @OA\Response(response=201, description="Success",
      *      @OA\JsonContent(
      *          @OA\Property(property="data", type="object", ref="#/components/schemas/Category"),
      *      )
@@ -156,15 +98,7 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request)
     {
         $category = Category::create($request->all());
-
-        $imageName = Str::slug($request->name) . '.' . $request->image->extension();
-        $imagePath = Storage::putFileAs(
-            'public/hinh-anh/danh-muc/' . $category->id,
-            $request->file('image'),
-            $imageName
-        );
-
-        $category->image = Storage::url($imagePath);
+        $category->image = Category::handleUploadImage($category->id, $request->name, $request->image);
         $category->save();
 
         return response()->json([
@@ -184,16 +118,8 @@ class CategoryController extends Controller
      *      {"bearerAuth": {}}
      *  },
      * 
-     *  @OA\Parameter(
-     *      name="id",
-     *      in="path",
-     *      required=true,
-     *      @OA\Schema(type="integer")
-     *  ),
-     * 
-     *  @OA\Response(
-     *      response=200,
-     *      description="Success",
+     *  @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *  @OA\Response(response=200, description="Success",
      *      @OA\JsonContent(
      *          @OA\Property(property="data", type="object", ref="#/components/schemas/Category"),
      *      )
@@ -235,14 +161,7 @@ class CategoryController extends Controller
      *      {"bearerAuth": {}}
      *  },
      * 
-     *  @OA\Parameter(
-     *      name="id",
-     *      in="path",
-     *      required=true,
-     *      @OA\Schema(
-     *          type="integer",
-     *      )
-     *  ),
+     *  @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer",)),
      *  @OA\RequestBody(
      *      @OA\MediaType(
      *          mediaType="multipart/form-data",
@@ -256,9 +175,7 @@ class CategoryController extends Controller
      *          )
      *      )
      *  ),
-     *  @OA\Response(
-     *      response=201,
-     *      description="Success",
+     *  @OA\Response(response=200, description="Success",
      *      @OA\JsonContent(
      *          @OA\Property(property="data", type="object", ref="#/components/schemas/Category"),
      *      )
@@ -282,29 +199,17 @@ class CategoryController extends Controller
         DB::beginTransaction();
         try {
             $category = Category::findOrFail($id);
-            $directory = 'public/hinh-anh/danh-muc/' . $category->id;
-            $oldImageName = $category->slug;
-            $oldImageExtension = substr($category->image, -3);
+            $categoryId = $category->id;
+            $categoryImage = $category->image;
+            $categoryName = $category->slug;
 
             $category->update($request->all());
 
             if ($request->hasFile('image')) {
-                Storage::deleteDirectory($directory);
-                $newImageName = Str::slug($request->name) . '.' . $request->image->extension();
-                $newPathImage = Storage::putFileAs(
-                    $directory,
-                    $request->file('image'),
-                    $newImageName
-                );
-
-                $category->image = Storage::url($newPathImage);
+                $category->image = Category::handleUploadImage($categoryId, $request->name, $request->image);
                 $category->save();
             } else {
-                $oldPathImage = $directory . '/' . $oldImageName . '.' . $oldImageExtension;
-                $newPathImage = $directory . '/' . $category->slug . '.' . $oldImageExtension;
-                Storage::move($oldPathImage, $newPathImage);
-
-                $category->image = Storage::url($newPathImage);
+                $category->image = Category::renameStorageImage($categoryId, $categoryName, $categoryImage, $request->name);
                 $category->save();
             }
             DB::commit();
@@ -312,7 +217,7 @@ class CategoryController extends Controller
                 'status'    => true,
                 'message'   => 'Sửa thành công',
                 'data'      => new CategoryDetailResource($category)
-            ], 201);
+            ], 200);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -331,14 +236,7 @@ class CategoryController extends Controller
      *  security={
      *      {"bearerAuth": {}}
      *  },
-     * 
-     *  @OA\Parameter(
-     *      name="id",
-     *      in="path",
-     *      required=true,
-     *      @OA\Schema(type="integer")
-     *  ),
-     * 
+     *  @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *  @OA\Response(response=200,description="Success"),
      *  @OA\Response(response=401,description="Unauthenticated"),
      *  @OA\Response(response=403,description="Forbidden"),
@@ -354,12 +252,9 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         try {
-
             $category = Category::findOrFail($id);
-            $directory = 'public/hinh-anh/danh-muc/' . $category->id;
-            if (Storage::exists($directory)) {
-                Storage::deleteDirectory($directory);
-            }
+            Category::removeImageDirectory($id);
+
             $category->delete();
 
             return response()->json([

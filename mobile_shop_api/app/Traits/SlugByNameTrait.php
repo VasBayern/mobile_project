@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Trait;
+namespace App\Traits;
 
 use Illuminate\Support\Str;
 
-trait setSlugTrait
+trait SlugByNameTrait
 {
     public function setNameAttribute($value)
     {

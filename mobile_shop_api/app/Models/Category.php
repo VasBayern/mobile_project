@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
-use App\Trait\setSlugTrait;
+use App\Traits\SlugByNameTrait;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * @OA\Tag(
@@ -23,7 +26,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Category extends Model
 {
-    use HasFactory, setSlugTrait;
+    use HasFactory, SlugByNameTrait;
+
+    const DIRECTORY_PATH = 'public/hinh-anh/danh-muc/';
 
     /**
      * The table associated with the model.
@@ -45,4 +50,101 @@ class Category extends Model
      * @var array
      */
     protected $appends = [];
+
+    /**
+     * Function get category with order condition
+     * 
+     * @param  array $page
+     * @return array 
+     */
+    public static function getCategoryWithOrder($page)
+    {
+        $search = isset($page['search']) ? $page['search'] : '';
+        $perPage = $page['per_page'];
+        $sortOrder = ($page['order'] == 1) ? 'DESC' : 'ASC';
+        $sortColumn = '';
+        switch ($page['sort']) {
+            case 0:
+                $sortColumn = 'id';
+                break;
+            case 1:
+                $sortColumn = 'name';
+                break;
+            case 2:
+                $sortColumn = 'sort_no';
+                break;
+            case 3:
+                $sortColumn = 'home';
+                break;
+            case 4:
+                $sortColumn = 'image';
+                break;
+            default:
+                throw new Exception("Không tìm thấy trường này");
+                break;
+        }
+        return Category::when($search, function ($query, $search) {
+            $query->where('name', 'LIKE', '%' . $search . '%');
+        })->orderBy($sortColumn, $sortOrder)->paginate($perPage);
+    }
+
+    /**
+     * Upload image when request has image file
+     * 
+     * @param  integer $id
+     * @param  string $requestName 
+     * @param  file $requestImage
+     * 
+     * @return string 
+     */
+    public static function handleUploadImage($id, $requestName, $requestImage)
+    {
+        $directory = Category::DIRECTORY_PATH . $id;
+        if (Storage::exists($directory)) {
+            Storage::deleteDirectory($directory);
+        }
+        $nameImage = Str::slug($requestName) . '.' . $requestImage->extension();
+        $pathImage = Storage::putFileAs($directory, $requestImage, $nameImage);
+
+        return Storage::url($pathImage);
+    }
+
+    /**
+     * Rename image when update name
+     * 
+     * @param  integer $id
+     * @param  string $name Current name
+     * @param  string $path Current path image
+     * @param  string $requestName Request name to update  
+     * 
+     * @return string 
+     */
+    public static function renameStorageImage($id, $name,  $path, $requestName)
+    {
+        $directory = Category::DIRECTORY_PATH . $id;
+
+        $arrayPathImage = explode('/', $path);
+        $oldNameImage = end($arrayPathImage);
+        $oldPathImage = $directory . '/' . $oldNameImage;
+        $newPathImage = Str::replaceLast($name, Str::slug($requestName), $oldPathImage);
+
+        if ($newPathImage != $oldPathImage) {
+            Storage::move($oldPathImage, $newPathImage);
+        }
+
+        return Storage::url($newPathImage);
+    }
+
+    /**
+     * Remove image folder when delete item
+     * 
+     * @param  integer $id
+     */
+    public static function removeImageDirectory($id)
+    {
+        $directory = Category::DIRECTORY_PATH . $id;
+        if (Storage::exists($directory)) {
+            Storage::deleteDirectory($directory);
+        }
+    }
 }
