@@ -637,7 +637,7 @@
                     {
                         "name": "sort",
                         "in": "query",
-                        "description": "sort by column: 0-id, 1-name, 2-sort_no, 3-home, 4-image",
+                        "description": "sort by column: 0-id, 1-name, 2-sort_no, 3-home, 4-image, 5-created_at",
                         "required": true,
                         "schema": {
                             "type": "integer",
@@ -647,7 +647,8 @@
                                 1,
                                 2,
                                 3,
-                                4
+                                4,
+                                5
                             ]
                         }
                     },
@@ -668,17 +669,37 @@
                     {
                         "name": "per_page",
                         "in": "query",
-                        "description": "sort by paginate page: 10, 25, 50, 100",
+                        "description": "sort by paginate page: 0-10, 1-25, 2-50, 3-100",
                         "required": true,
                         "schema": {
                             "type": "integer",
-                            "default": "10",
+                            "default": "0",
                             "enum": [
-                                10,
-                                25,
-                                50,
-                                100
+                                0,
+                                1,
+                                2,
+                                3
                             ]
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "start date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "end date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
                         }
                     },
                     {
