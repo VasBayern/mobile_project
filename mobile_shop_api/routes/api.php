@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\Export\CategoryExportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,3 +40,4 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 });
 
 Route::apiResource('categories', CategoryController::class);
+Route::get('categories/excel/export', [CategoryExportController::class, 'export']);

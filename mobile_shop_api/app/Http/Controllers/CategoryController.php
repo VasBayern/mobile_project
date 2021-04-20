@@ -196,11 +196,10 @@ class CategoryController extends Controller
 
             if ($request->hasFile('image')) {
                 $category->image = Category::handleUploadImage($categoryId, $request->name, $request->image);
-                $category->save();
             } else {
                 $category->image = Category::renameStorageImage($categoryId, $categoryName, $categoryImage, $request->name);
-                $category->save();
             }
+            $category->save();
             DB::commit();
 
             return $this->respondWithResource(new CategoryDetailResource($category), 'Sửa thành công', 200);
