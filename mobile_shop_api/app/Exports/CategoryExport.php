@@ -3,75 +3,116 @@
 namespace App\Exports;
 
 use App\Models\Category;
-use Illuminate\Contracts\Support\Responsable;
-use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\WithCustomStartCell;
-use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class CategoryExport implements FromCollection, WithCustomStartCell, Responsable
+class CategoryExport implements
+FromCollection,
+    ShouldAutoSize,
+    WithMapping,
+    WithHeadings,
+    WithStyles,
+    WithColumnWidths,
+    WithTitle
 {
-    use Exportable;
-
     /**
-     * It's required to define the fileName within
-     * the export class when making use of Responsable.
+     * Instantiate a new controller instance
+     *
+     * @param  array $condition
+     * @param  int $page
+     * 
+     * @return void
      */
-    private $fileName = 'categories.xlsx';
-
-    /**
-     * Optional Writer Type
-     */
-    private $writerType = \Maatwebsite\Excel\Excel::XLSX;
-
-    /**
-     * Optional headers
-     */
-    private $headers = [
-        'Content-Type' => 'text/csv',
-    ];
-
-    public function forYear(int $year = 2021)
+    public function __construct(array $condition, int $page)
     {
-        $this->year = $year;
+        $this->condition = $condition;
+        $this->page = $page;
     }
 
-    // public function query()
-    // {
-    //     return Category::query()->whereYear('created_at', $this->year);
-    // }
-
     /**
+     * Get category collection with condition
+     * 
      * @return \Illuminate\Support\Collection
      */
-    public function collection()
-    {
-        return Category::all();
+    public function collection() {
+        return Category::getCategoryWithOrder($this->condition);
     }
 
-    public function startCell(): string
-    {
-        return 'A3';
-    }
-
+    /**
+     * Set heading column
+     * 
+     * @return array
+     */
     public function headings(): array
     {
         return [
-            '#',
-            'Name',
-            'Home',
-            'Created At'
+            'ID',
+            'Tên danh mục',
+            'Ảnh',
+            'Hiển thị',
+            'Thứ tự',
+            'Ngày tạo'
         ];
     }
 
+    /**
+     * Set data column base on heading
+     * 
+     * @param object $category
+     *  
+     * @return array
+     */
     public function map($category): array
     {
         return [
             $category->id,
             $category->name,
+            $category->image,
             $category->home,
+            $category->sort_no,
             $category->created_at
         ];
+    }
+
+    /**
+     * Set name of multiple sheets
+     * 
+     * @return string
+     */
+    public function title(): string
+    {
+        return 'Trang ' . $this->page;
+    }
+
+    /**
+     * Set width of column (auto size is not working)
+     * 
+     * @return array
+     */
+    public function columnWidths(): array
+    {
+        return [
+            'B' => 20,
+            'C' => 50,
+            'F' => 20,
+        ];
+    }
+
+    /**
+     * Set style for column
+     * 
+     * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet
+     */
+    public function styles(Worksheet $sheet)
+    {
+        $sheet->getStyle('1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:F1')->getAlignment()->setHorizontal('center');
     }
 }

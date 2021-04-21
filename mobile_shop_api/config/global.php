@@ -7,7 +7,10 @@ return [
     | Specify how much data the page will be loaded
     |
     */
-    'pagination_page'   => [10, 25, 50, 100],
+    'pagination'    => [
+        'max_record'    => 100,
+        'per_page'      => [10, 25, 50, 100],
+    ],
 
     /*
     |--------------------------------------------------------------------------

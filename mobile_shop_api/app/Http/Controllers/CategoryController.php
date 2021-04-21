@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CategoryMultiSheetExport;
 use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Http\Resources\CategoryDetailResource;
@@ -11,10 +12,25 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Maatwebsite\Excel\Excel;
 
 class CategoryController extends Controller
 {
     use ApiResponseTrait;
+
+    private $excel;
+
+    /**
+     * Instantiate a new controller instance
+     *
+     * @param  \Maatwebsite\Excel\Excel  $excel
+     * @return void
+     */
+    public function __construct(Excel $excel)
+    {
+        $this->excel = $excel;
+    }
+
     /**
      * @OA\Get(
      *  path="/categories",
@@ -48,8 +64,8 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         try {
-            $page = $request->all();
-            $categories = Category::getCategoryWithOrder($page);
+            $condition = $request->all();
+            $categories = Category::getCategoryWithOrder($condition);
 
             return $this->respondWithResourceCollection(CategoryDetailResource::collection($categories));
         } catch (Exception $exception) {
@@ -244,6 +260,40 @@ class CategoryController extends Controller
             return $this->respondSuccess('Xoá thành công');
         } catch (Exception $exception) {
             return $this->respondError('ID không tồn tại!', 404, $exception);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *  path="/categories/excel/export",
+     *  tags={"Category"},
+     *  summary="Export Excel Category",
+     *  operationId="exportCategory",
+     *  security={
+     *      {"bearerAuth": {}}
+     *  },
+     *  @OA\Parameter(name="sort", in="query", required=true, description="sort by column: 0-id, 1-name, 2-sort_no, 3-home, 4-image, 5-created_at", @OA\Schema(type="integer", default="0", enum={0,1,2,3,4,5})),
+     *  @OA\Parameter(name="order", in="query", required=true, description="sort by order: 0-ASC, 1-DESC", @OA\Schema(type="integer", default="0", enum={0,1})),
+     *  @OA\Parameter(name="per_page", in="query", required=true, description="sort by paginate page: 0-10, 1-25, 2-50, 3-100", @OA\Schema(type="integer", default="0", enum={0,1,2,3})),
+     *  @OA\Parameter(name="start_date", in="query", required=false, description="start date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
+     *  @OA\Parameter(name="end_date", in="query", required=false, description="end date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
+     *  @OA\Parameter(name="search", in="query", required=false, description="search by name", @OA\Schema(type="string")),
+     *  @OA\Response(response=200, description="Success",
+
+     *  ),
+     *  @OA\Response(response=400,description="Bad Request"),
+     *  @OA\Response(response=401,description="Unauthenticated"),
+     *)
+     **/
+    public function export(Request $request)
+    {
+        try {
+            $condition = $request->all();
+            $fileName = 'danh-muc-' . now()->format('dmY-his') . '.xlsx';
+
+            return $this->excel->download(new CategoryMultiSheetExport($condition), $fileName);
+        } catch (Exception $exception) {
+            return $this->respondError('Điều kiện không chính xác', 400, $exception);
         }
     }
 }

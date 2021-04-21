@@ -641,7 +641,15 @@
                         "required": true,
                         "schema": {
                             "type": "integer",
-                            "default": "0"
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5
+                            ]
                         }
                     },
                     {
@@ -975,6 +983,104 @@
                     },
                     "404": {
                         "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/categories/excel/export": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Export Excel Category",
+                "operationId": "exportCategory",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "sort by column: 0-id, 1-name, 2-sort_no, 3-home, 4-image, 5-created_at",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort by order: 0-ASC, 1-DESC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "sort by paginate page: 0-10, 1-25, 2-50, 3-100",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "start date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "end date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "search by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 },
                 "security": [

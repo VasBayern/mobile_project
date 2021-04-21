@@ -98,13 +98,14 @@ class Category extends Model
      * Scope a query to only include data of given paginate
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  int  $paginate
+     * @param  int  $paginationKey
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeOfPaginate($query, $paginateKey)
+    public function scopeOfPaginate($query, $paginationKey)
     {
-        $paginatationPage = config('global.pagination_page');
-        $perPage = array_key_exists($paginateKey, $paginatationPage) == true ? $paginatationPage[$paginateKey] : $paginatationPage[3];
+        $paginatationPage = config('global.pagination.per_page');
+        $maxRecord = config('global.pagination.max_record');
+        $perPage = array_key_exists($paginationKey, $paginatationPage) == true ? $paginatationPage[$paginationKey] : $maxRecord;
 
         return $query->paginate($perPage);
     }
@@ -133,19 +134,19 @@ class Category extends Model
     /**
      * Function get category with order condition
      * 
-     * @param  array $page
+     * @param  array $condition
      * @return array 
      */
-    public static function getCategoryWithOrder($page)
+    public static function getCategoryWithOrder($condition)
     {
-        $search = isset($page['search']) ? $page['search'] : '';
-        $startDate = isset($page['start_date']) ? $page['start_date'] : config('global.datetime.default_date');
-        $endDate = isset($page['end_date']) ? $page['end_date'] : now()->format(config('global.datetime.format.input_date'));
+        $search = isset($condition['search']) ? $condition['search'] : '';
+        $startDate = isset($condition['start_date']) ? $condition['start_date'] : config('global.datetime.default_date');
+        $endDate = isset($condition['end_date']) ? $condition['end_date'] : now()->format(config('global.datetime.format.input_date'));
 
         return Category::ofSearch($search)
             ->ofDate($startDate, $endDate)
-            ->ofOrderBy($page['sort'], $page['order'])
-            ->ofPaginate($page['per_page']);
+            ->ofOrderBy($condition['sort'], $condition['order'])
+            ->ofPaginate($condition['per_page']);
     }
 
     /**
