@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\UpdateUserRequest;
 use App\Models\User;
 use App\Traits\ApiResponseTrait;
+use App\Traits\HandleImageTrait;
 use DateTime;
 use Exception;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    use ApiResponseTrait;
+    use ApiResponseTrait, HandleImageTrait;
     /**
      * @OA\Get(
      *  path="/user",
@@ -151,12 +152,12 @@ class UserController extends Controller
                 $user->name = $requestName;
 
                 if (!$request->hasFile('avatar') && Storage::exists($directory)) {
-                    $user->avatar = User::renameStorageImage($user->id, $name, $avatar, $requestName);
+                    $user->avatar = $this->renameStorageImage($directory, $name, $avatar, $requestName);
                 }
             }
             if ($request->hasFile('avatar')) {
                 $userName = $request->has('name') ? $request->name : $user->name;
-                $user->avatar = User::handleUploadImage($user->id, $userName, $request->avatar);
+                $user->avatar = $this->handleUploadImage($directory, $userName, $request->avatar);
             }
             $user->save();
             DB::commit();
@@ -202,7 +203,9 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            User::removeImageDirectory($id);
+            $directory = User::DIRECTORY_PATH . $user->id;
+            $this->removeImageDirectory($directory);
+
             $user->delete();
 
             return $this->respondSuccess('Xóa thành công');
