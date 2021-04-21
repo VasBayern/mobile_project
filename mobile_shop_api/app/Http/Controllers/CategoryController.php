@@ -66,7 +66,7 @@ class CategoryController extends Controller
     {
         try {
             $condition = $request->all();
-            $categories = Category::getCategoryWithOrder($condition);
+            $categories = (new Category)->getCategoryWithOrder($condition);
 
             return $this->respondWithResourceCollection(CategoryDetailResource::collection($categories));
         } catch (Exception $exception) {
@@ -119,6 +119,7 @@ class CategoryController extends Controller
         $directory = Category::DIRECTORY_PATH . $category->id;
         $category->image = $this->handleUploadImage($directory, $request->name, $request->image);
         $category->save();
+
         return $this->respondWithResource(new CategoryDetailResource($category), 'Thêm thành công', 201);
     }
 

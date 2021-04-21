@@ -42,7 +42,7 @@ FromCollection,
      * @return \Illuminate\Support\Collection
      */
     public function collection() {
-        return Category::getCategoryWithOrder($this->condition);
+        return (new Category)->getCategoryWithOrder($this->condition);
     }
 
     /**
