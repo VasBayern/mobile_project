@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Models\User;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Password;
 
 class PasswordController extends Controller
 {
+    use ApiResponseTrait;
+
     /**
      * @OA\Get(
      *  path="/password/forgot",
@@ -48,10 +51,7 @@ class PasswordController extends Controller
         $credentials = $request->validated();
         Password::sendResetLink($credentials);
 
-        return response()->json([
-            'success'   => true,
-            'message'   => 'Mã đặt lại mật khẩu đã được gửi tới email của bạn!'
-        ], 200);
+        return $this->respondSuccess('Mã đặt lại mật khẩu đã được gửi tới email của bạn!');
     }
 
     /**
@@ -63,13 +63,13 @@ class PasswordController extends Controller
      */
     public function getToken(Request $request)
     {
-        return response()->json([
-            'success'   => true,
-            'data'      => [
+        return $this->respondSuccess(
+            'Token reset password',
+            [
                 'email'     => $request->email,
                 'token'     => $request->token,
-            ]
-        ], 200);
+            ],
+        );
     }
 
     /**
@@ -111,16 +111,9 @@ class PasswordController extends Controller
         });
 
         if ($resetPasswordStatus == Password::INVALID_TOKEN) {
-            return response()->json([
-                'success'   => true,
-                'message'   => 'Mã Token không chính xác!'
-            ], 422);
+            return $this->respondUnprocessableEntity(null, 'Mã Token không chính xác!');
         }
-
-        return response()->json([
-            'success'   => true,
-            'message'   => 'Thay đổi mật khẩu thành công!'
-        ], 200);
+        return $this->respondSuccess('Thay đổi mật khẩu thành công!');
     }
 
     /**
@@ -160,16 +153,10 @@ class PasswordController extends Controller
     {
         $user = Auth::user();
         if (!Hash::check($request->old_password, $user->password)) {
-            return response()->json([
-                'success'   => false,
-                'message'   => 'Mật khẩu hiện tại không đúng!'
-            ], 422);
+            return $this->respondUnprocessableEntity(null, 'Mật khẩu hiện tại không đúng!');
         }
         User::where('id', $user->id)->update(['password' => bcrypt($request->new_password)]);
 
-        return response()->json([
-            'success'   => true,
-            'message'   => 'Thay đổi mật khẩu thành công!'
-        ], 200);
+        return $this->respondSuccess('Thay đổi mật khẩu thành công!');
     }
 }

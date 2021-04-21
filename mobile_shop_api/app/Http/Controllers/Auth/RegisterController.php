@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
+    use ApiResponseTrait;
+
     /**
      * @OA\Post(
      *  path="/register",
@@ -49,11 +52,6 @@ class RegisterController extends Controller
         $token =  $user->createToken('browser')->plainTextToken;
         event(new Registered($user));
 
-        return response()->json([
-            'success'       => true,
-            'message'       => 'Đăng kí thành công',
-            'token_type'    => 'Bearer',
-            'access_token'  => $token,
-        ], 201);
+        return $this->respondAuthenticated('Đăng kí thành công', $token, 201);
     }
 }

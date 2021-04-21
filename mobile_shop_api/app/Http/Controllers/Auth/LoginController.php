@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
+    use ApiResponseTrait;
     /**
      * @OA\Post(
      *  path="/login",
@@ -46,18 +47,11 @@ class LoginController extends Controller
     {
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
-            throw ValidationException::withMessages([
-                'email' => ['Email hoặc mật khẩu không chính xác'],
-            ]);
+            return $this->respondUnprocessableEntity(null, 'Email hoặc mật khẩu không chính xác!');
         }
         $token = Auth::user()->createToken($request->device_name)->plainTextToken;
 
-        return response()->json([
-            'success'       => true,
-            'message'       => 'Đăng nhập thành công',
-            'token_type'    => 'Bearer',
-            'access_token'  => $token,
-        ], 200);
+        return $this->respondAuthenticated('Đăng nhập thành công', $token);
     }
 
     /**
@@ -84,9 +78,6 @@ class LoginController extends Controller
     {
         $request->user()->tokens()->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Đăng xuất thành công!'
-        ], 200);
+        return $this->respondSuccess('Đăng xuất thành công!');
     }
 }

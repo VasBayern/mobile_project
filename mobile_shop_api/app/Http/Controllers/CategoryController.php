@@ -69,7 +69,7 @@ class CategoryController extends Controller
 
             return $this->respondWithResourceCollection(CategoryDetailResource::collection($categories));
         } catch (Exception $exception) {
-            return $this->respondError('Điều kiện không chính xác', 400, $exception);
+            return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
         }
     }
 
@@ -153,7 +153,7 @@ class CategoryController extends Controller
             $category = Category::findOrFail($id);
             return $this->respondWithResource(new CategoryDetailResource($category));
         } catch (Exception $exception) {
-            return $this->respondError('ID không tồn tại!', 404, $exception);
+            return $this->respondNotFound($exception, 'ID không tồn tại!');
         }
     }
 
@@ -220,10 +220,10 @@ class CategoryController extends Controller
             $category->save();
             DB::commit();
 
-            return $this->respondWithResource(new CategoryDetailResource($category), 'Sửa thành công', 200);
+            return $this->respondWithResource(new CategoryDetailResource($category), 'Sửa thành công');
         } catch (Exception $exception) {
             DB::rollBack();
-            return $this->respondError('Có lỗi xảy ra. Vui lòng thử lại!', 400, $exception);
+            return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
         }
     }
 
@@ -259,7 +259,7 @@ class CategoryController extends Controller
 
             return $this->respondSuccess('Xoá thành công');
         } catch (Exception $exception) {
-            return $this->respondError('ID không tồn tại!', 404, $exception);
+            return $this->respondNotFound($exception, 'ID không tồn tại!');
         }
     }
 
@@ -293,7 +293,7 @@ class CategoryController extends Controller
 
             return $this->excel->download(new CategoryMultiSheetExport($condition), $fileName);
         } catch (Exception $exception) {
-            return $this->respondError('Điều kiện không chính xác', 400, $exception);
+            return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
         }
     }
 }

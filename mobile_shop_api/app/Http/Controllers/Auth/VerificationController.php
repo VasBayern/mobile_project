@@ -4,11 +4,19 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 
 class VerificationController extends Controller
 {
+    use ApiResponseTrait;
+
+    /**
+     * Instantiate a new controller instance
+     * 
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth:sanctum')->except(['verify']);
@@ -77,10 +85,7 @@ class VerificationController extends Controller
     public function verify($id, Request $request)
     {
         if (!$request->hasValidSignature()) {
-            return response()->json([
-                'success'   => false,
-                'message'   => 'Xác thực không thành công!'
-            ], 422);
+            return $this->respondUnprocessableEntity(null, 'Xác thực không thành công!');
         }
 
         $user = User::findOrFail($id);
@@ -88,11 +93,7 @@ class VerificationController extends Controller
         if (!$user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
         }
-
-        return response()->json([
-            'success'   => true,
-            'message'   => 'Xác thực thành công!'
-        ], 200);
+        return $this->respondSuccess('Xác thực thành công!');
     }
 
     /**
@@ -119,16 +120,9 @@ class VerificationController extends Controller
     public function resend()
     {
         if (auth()->user()->hasVerifiedEmail()) {
-            return response()->json([
-                'success'   => false,
-                'message'   => 'Tài khoản đã xác thực từ trước!'
-            ], 422);
+            return $this->respondUnprocessableEntity(null, 'Tài khoản đã xác thực từ trước!');
         }
         event(new Registered(auth()->user()));
-
-        return response()->json([
-            'success'   => true,
-            'message'   => 'Đã gửi email xác thực!'
-        ], 200);
+        return $this->respondSuccess('Đã gửi email xác thực!');
     }
 }

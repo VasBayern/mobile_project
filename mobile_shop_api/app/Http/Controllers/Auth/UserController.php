@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\UpdateUserRequest;
 use App\Models\User;
+use App\Traits\ApiResponseTrait;
 use DateTime;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+    use ApiResponseTrait;
     /**
      * @OA\Get(
      *  path="/user",
@@ -46,10 +48,7 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        return response()->json([
-            'status'    => true,
-            'data'      => $user,
-        ], 200);
+        return $this->respondWithResource($user);
     }
 
     /**
@@ -106,7 +105,7 @@ class UserController extends Controller
      *  ),
      * 
      *  @OA\Response(
-     *      response=201,
+     *      response=200,
      *      description="Success",
      *      @OA\JsonContent(
      *          @OA\Property(property="data", type="object", ref="#/components/schemas/User"),
@@ -178,18 +177,10 @@ class UserController extends Controller
             }
             $user->save();
             DB::commit();
-
-            return response()->json([
-                'success'   => true,
-                'message'   => 'Cập nhật thành công!',
-                'data'      => $user
-            ], 201);
-        } catch (Exception $e) {
+            return $this->respondWithResource($user, 'Cập nhật thành công!');
+        } catch (Exception $exception) {
             DB::rollBack();
-            return response()->json([
-                'success'   => false,
-                'message'   => $e->getMessage()
-            ], 422);
+            return $this->respondError($exception);
         }
     }
 
@@ -230,15 +221,9 @@ class UserController extends Controller
             $user = User::findOrFail($id);
             $user->delete();
 
-            return response()->json([
-                'success'   => true,
-                'message'   => 'Xóa thành công'
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'success'   => false,
-                'message'   => $e->getMessage()
-            ], 404);
+            return $this->respondSuccess('Xóa thành công');
+        } catch (Exception $exception) {
+            return $this->respondNotFound($exception, 'ID không tồn tại!');
         }
     }
 }
