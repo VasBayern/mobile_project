@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\VerificationController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,7 +30,6 @@ Route::get('password/token', [PasswordController::class, 'getToken'])->name('pas
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('user', [UserController::class, 'getUser']);
     Route::put('user/update', [UserController::class, 'update']);
-    Route::delete('user/destroy/{id}', [UserController::class, 'destroy']);
     Route::post('logout', [LoginController::class, 'logout']);
 
     Route::get('email/verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify');
@@ -37,3 +37,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::patch('password/change', [PasswordController::class, 'change']);
 });
+
+Route::apiResource('categories', CategoryController::class);
+Route::get('categories/excel/export', [CategoryController::class, 'export']);
