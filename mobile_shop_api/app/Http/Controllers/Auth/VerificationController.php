@@ -4,11 +4,19 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 
 class VerificationController extends Controller
 {
+    use ApiResponseTrait;
+
+    /**
+     * Instantiate a new controller instance
+     * 
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth:sanctum')->except(['verify']);
@@ -18,10 +26,12 @@ class VerificationController extends Controller
      * @OA\Get(
      *  path="/email/verify/{id}",
      *  tags={"Authentication"},
-     *  summary="Verify Email",
+     *  summary="Verify Email After Register",
      *  operationId="verifyEmail",
-     *  description="Verify account by link received from email",
-     *  security={{"bearerAuth": {}}},
+     *  description="Verify account by link had been received from email",
+     *  security={
+     *      {"bearerAuth": {}}
+     *  },
      *
      *  @OA\Parameter(
      *      name="id",
@@ -59,28 +69,23 @@ class VerificationController extends Controller
      *           type="string"
      *      )
      *  ),
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
+     *  @OA\Response(response=422,description="Unprocessable entity"),
      *)
      **/
 
     /**
      * Verify email
      *
-     * @param $id
+     * @param integer $id
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function verify($id, Request $request)
     {
         if (!$request->hasValidSignature()) {
-            return response()->json([
-                'success'   => false,
-                'message'   => 'Signature is invalid!'
-            ], 401);
+            return $this->respondUnprocessableEntity(null, 'Xác thực không thành công!');
         }
 
         $user = User::findOrFail($id);
@@ -88,27 +93,22 @@ class VerificationController extends Controller
         if (!$user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
         }
-
-        return response()->json([
-            'success'   => true,
-            'message'   => 'Email verify success!'
-        ], 200);
+        return $this->respondSuccess('Xác thực thành công!');
     }
 
     /**
      * @OA\Get(
      *  path="/email/resend",
      *  tags={"Authentication"},
-     *  summary="Resend Email",
+     *  summary="Resend Email To Verify",
      *  operationId="resendEmail",
-     *  description="Resend email to verify",
-     *  security={{"bearerAuth": {}}},
+     *  security={
+     *      {"bearerAuth": {}}
+     *  },
      *
-     *  @OA\Response(response=201,description="Success",@OA\MediaType( mediaType="application/json",)),
+     *  @OA\Response(response=200,description="Success",@OA\MediaType( mediaType="application/json",)),
      *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=400,description="Bad Request"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=403,description="Forbidden")
+     *  @OA\Response(response=422,description="Unprocessable entity"),
      *)
      **/
 
@@ -120,16 +120,9 @@ class VerificationController extends Controller
     public function resend()
     {
         if (auth()->user()->hasVerifiedEmail()) {
-            return response()->json([
-                'success'   => false,
-                'message'   => 'Account has verified!'
-            ], 200);
+            return $this->respondUnprocessableEntity(null, 'Tài khoản đã xác thực từ trước!');
         }
         event(new Registered(auth()->user()));
-
-        return response()->json([
-            'success'   => true,
-            'message'   => 'Email sent!'
-        ], 200);
+        return $this->respondSuccess('Đã gửi email xác thực!');
     }
 }

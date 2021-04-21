@@ -8,6 +8,7 @@ use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Http\Resources\CategoryDetailResource;
 use App\Models\Category;
 use App\Traits\ApiResponseTrait;
+use App\Traits\HandleImageTrait;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ use Maatwebsite\Excel\Excel;
 
 class CategoryController extends Controller
 {
-    use ApiResponseTrait;
+    use ApiResponseTrait, HandleImageTrait;
 
     private $excel;
 
@@ -69,7 +70,7 @@ class CategoryController extends Controller
 
             return $this->respondWithResourceCollection(CategoryDetailResource::collection($categories));
         } catch (Exception $exception) {
-            return $this->respondError('Điều kiện không chính xác', 400, $exception);
+            return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
         }
     }
 
@@ -115,7 +116,8 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request)
     {
         $category = Category::create($request->all());
-        $category->image = Category::handleUploadImage($category->id, $request->name, $request->image);
+        $directory = Category::DIRECTORY_PATH . $category->id;
+        $category->image = $this->handleUploadImage($directory, $request->name, $request->image);
         $category->save();
         return $this->respondWithResource(new CategoryDetailResource($category), 'Thêm thành công', 201);
     }
@@ -153,7 +155,7 @@ class CategoryController extends Controller
             $category = Category::findOrFail($id);
             return $this->respondWithResource(new CategoryDetailResource($category));
         } catch (Exception $exception) {
-            return $this->respondError('ID không tồn tại!', 404, $exception);
+            return $this->respondNotFound($exception, 'ID không tồn tại!');
         }
     }
 
@@ -206,24 +208,24 @@ class CategoryController extends Controller
         DB::beginTransaction();
         try {
             $category = Category::findOrFail($id);
-            $categoryId = $category->id;
+            $directory = Category::DIRECTORY_PATH . $id;
             $categoryImage = $category->image;
-            $categoryName = $category->slug;
+            $categoryName = $category->name;
 
             $category->update($request->all());
 
             if ($request->hasFile('image')) {
-                $category->image = Category::handleUploadImage($categoryId, $request->name, $request->image);
+                $category->image = $this->handleUploadImage($directory, $request->name, $request->image);
             } else {
-                $category->image = Category::renameStorageImage($categoryId, $categoryName, $categoryImage, $request->name);
+                $category->image = $this->renameStorageImage($directory, $categoryName, $categoryImage, $request->name);
             }
             $category->save();
             DB::commit();
 
-            return $this->respondWithResource(new CategoryDetailResource($category), 'Sửa thành công', 200);
+            return $this->respondWithResource(new CategoryDetailResource($category), 'Sửa thành công');
         } catch (Exception $exception) {
             DB::rollBack();
-            return $this->respondError('Có lỗi xảy ra. Vui lòng thử lại!', 400, $exception);
+            return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
         }
     }
 
@@ -254,12 +256,14 @@ class CategoryController extends Controller
     {
         try {
             $category = Category::findOrFail($id);
-            Category::removeImageDirectory($id);
+            $directory = Category::DIRECTORY_PATH . $id;
+            $this->removeImageDirectory($directory);
+
             $category->delete();
 
             return $this->respondSuccess('Xoá thành công');
         } catch (Exception $exception) {
-            return $this->respondError('ID không tồn tại!', 404, $exception);
+            return $this->respondNotFound($exception, 'ID không tồn tại!');
         }
     }
 
@@ -293,7 +297,7 @@ class CategoryController extends Controller
 
             return $this->excel->download(new CategoryMultiSheetExport($condition), $fileName);
         } catch (Exception $exception) {
-            return $this->respondError('Điều kiện không chính xác', 400, $exception);
+            return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
         }
     }
 }

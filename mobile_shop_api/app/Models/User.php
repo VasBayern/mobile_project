@@ -7,134 +7,33 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
+ * 
+ * @OA\Tag(
+ *      name="Authentication",
+ *      description="Sanctum ToKen Authen",
+ * )
  * @OA\Schema(
- *     title="User",
- *     description="User model",
- *     @OA\Xml(
- *         name="User"
- *     )
+ *      required={"password"},
+ *      @OA\Xml(name="User"),
+ *      @OA\Property(property="id", type="integer", format="int64"),
+ *      @OA\Property(property="email", type="string", format="email"),
+ *      @OA\Property(property="name", type="string"),
+ *      @OA\Property(property="password", type="string", format="password"),
+ *      @OA\Property(property="avatar", type="string"),
+ *      @OA\Property(property="phone", type="string", minLength=10, maxLength=10),
+ *      @OA\Property(property="sex", type="integer", enum={0,1,2}, description="Sex: 0: Male, 1: Female, 2: Orther"),
+ *      @OA\Property(property="birthday", type="string", format="date-time", description="Birthday: dd/mm/yyyy"),
+ *      @OA\Property(property="address", type="string"),
+ *      @OA\Property(property="role", type="integer", enum={0,1,2}, description="Role: 0: User, 1: Admin, 2: Staff"),
  * )
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, HasApiTokens;
-
-    /**
-     * @OA\Property(
-     *     title="ID",
-     *     description="ID",
-     *     format="int64",
-     *     example=1
-     * )
-     *
-     * @var integer
-     */
-    private $id;
-
-    /**
-     * @OA\Property(
-     *      title="Email",
-     *      description="Email",
-     *      example="admin@example.com"
-     * )
-     *
-     * @var string
-     */
-    private $email1; //$email fail send email
-
-    /**
-     * @OA\Property(
-     *      title="Name",
-     *      description="Username",
-     *      example="Nguyen Van A"
-     * )
-     *
-     * @var string
-     */
-    private $name;
-
-
-
-    /**
-     * @OA\Property(
-     *      title="Password",
-     *      description="Password",
-     *      example="yourpassword"
-     * )
-     *
-     * @var string
-     */
-    private $password;
-
-    /**
-     * @OA\Property(
-     *      title="Avatar",
-     *      description="Avatar Image",
-     *      example="./avatar.ipg"
-     * )
-     *
-     * @var string
-     */
-    private $avatar;
-
-    /**
-     * @OA\Property(
-     *      title="Phone",
-     *      description="Number Phone",
-     *      example="0123456789"
-     * )
-     *
-     * @var string
-     */
-    private $phone;
-
-    /**
-     * @OA\Property(
-     *      title="sex",
-     *      description="Sex: 0:Male, 1: Female, 2: Orther",
-     *      example="0"
-     * )
-     *
-     * @var string
-     */
-    private $sex;
-
-    /**
-     * @OA\Property(
-     *      title="Birthday",
-     *      description="Birthday: dd/mm/yyyy",
-     *      example="31/12/2021"
-     * )
-     *
-     * @var string
-     */
-    private $birthday;
-
-    /**
-     * @OA\Property(
-     *      title="Address",
-     *      description="Address",
-     *      example="Cau Giay, Ha Noi"
-     * )
-     *
-     * @var string
-     */
-    private $address;
-
-
-    /**
-     * @OA\Property(
-     *      title="Role",
-     *      description="Role account: default 0 - guest",
-     *      format="int64",
-     *      example="0"
-     * )
-     *
-     * @var integer
-     */
-    private $role;
 
     /**
      * The attributes that are mass assignable.
@@ -172,6 +71,13 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $appends = [
         
     ];
+
+    /**
+     * The directory path where the image is stored
+     * 
+     * @var array
+     */
+    const DIRECTORY_PATH = 'public/hinh-anh/tai-khoan/';
 
     /**
      * Set avatar base on name after register

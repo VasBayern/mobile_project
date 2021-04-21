@@ -46,6 +46,11 @@ trait ApiResponseTrait
             $responseStructure['errors'] = $data['errors'];
         }
 
+        if (isset($data['access_token'])) {
+            $responseStructure['token_type'] = 'Bearer';
+            $responseStructure['access_token'] = $data['access_token'];
+        }
+
         if (isset($data['status'])) {
             $statusCode = $data['status'];
         }
@@ -72,7 +77,7 @@ trait ApiResponseTrait
             }
         } else {
             $responseStructure['data'] = $data['data'] ?? null;
-            // $responseStructure['error_code'] = 1;
+            // $responseStructure['error_code'] = 0;
         }
 
         return [
@@ -139,7 +144,7 @@ trait ApiResponseTrait
      *
      * @return JsonResponse
      */
-    protected function respondError($message, int $statusCode = 400, Exception $exception = null, int $error_code = 1)
+    protected function respondError(Exception $exception = null, $message = null, int $statusCode = 400, int $error_code = 1)
     {
         return $this->apiResponse(
             [
@@ -159,9 +164,15 @@ trait ApiResponseTrait
      *
      * @return JsonResponse
      */
-    protected function respondSuccess($message = null)
+    protected function respondSuccess($message = null, $data = null)
     {
-        return $this->apiResponse(['success' => true, 'message' => $message]);
+        return $this->apiResponse(
+            [
+                'success'   => true,
+                'message'   => $message,
+                'data'      => $data
+            ]
+        );
     }
 
     /**
@@ -171,9 +182,33 @@ trait ApiResponseTrait
      *
      * @return JsonResponse
      */
-    protected function respondCreated($data)
+    protected function respondCreated($message = null, $data = null)
     {
-        return $this->apiResponse($data, 201);
+        return $this->apiResponse([
+            'success'   => true,
+            'message'   => $message,
+            'data'      => $data
+        ], 201);
+    }
+
+    /**
+     * Respone with authenticate success.
+     *
+     * @param string $message
+     * @param string $access_token
+     *
+     * @return JsonResponse
+     */
+    protected function respondAuthenticated($message = null, $access_token = null, $statusCode = 200)
+    {
+        return $this->apiResponse(
+            [
+                'success'       => true,
+                'message'       => $message,
+                'access_token'  => $access_token
+            ],
+            $statusCode
+        );
     }
 
     /**
@@ -183,9 +218,9 @@ trait ApiResponseTrait
      *
      * @return JsonResponse
      */
-    protected function respondBadRequest($message = 'Bad Request')
+    protected function respondBadRequest(Exception $exception = null, $message = 'Bad Request')
     {
-        return $this->respondError($message, 400);
+        return $this->respondError($exception, $message, 400);
     }
 
     /**
@@ -195,9 +230,9 @@ trait ApiResponseTrait
      *
      * @return JsonResponse
      */
-    protected function respondUnauthorized($message = 'Unauthorized')
+    protected function respondUnauthorized(Exception $exception = null, $message = 'Unauthorized')
     {
-        return $this->respondError($message, 401);
+        return $this->respondError($exception, $message, 401);
     }
 
     /**
@@ -207,9 +242,9 @@ trait ApiResponseTrait
      *
      * @return JsonResponse
      */
-    protected function respondForbidden($message = 'Forbidden')
+    protected function respondForbidden(Exception $exception = null, $message = 'Forbidden')
     {
-        return $this->respondError($message, 403);
+        return $this->respondError($exception, $message, 403);
     }
 
     /**
@@ -219,9 +254,21 @@ trait ApiResponseTrait
      * 
      * @return JsonResponse
      */
-    protected function respondNotFound($message = 'Not Found')
+    protected function respondNotFound(Exception $exception = null, $message = 'Not Found')
     {
-        return $this->respondError($message, 404);
+        return $this->respondError($exception, $message, 404);
+    }
+
+    /**
+     * Respone with unprocessable entity.
+     *
+     * @param string $message
+     * 
+     * @return JsonResponse
+     */
+    protected function respondUnprocessableEntity(Exception $exception = null, $message = 'Unprocessable entity')
+    {
+        return $this->respondError($exception, $message, 422);
     }
 
     /**
@@ -231,9 +278,9 @@ trait ApiResponseTrait
      *
      * @return JsonResponse
      */
-    protected function respondInternalError($message = 'Internal Error')
+    protected function respondInternalError(Exception $exception = null, $message = 'Internal Error')
     {
-        return $this->respondError($message, 500);
+        return $this->respondError($exception, $message, 500);
     }
 
     /**
