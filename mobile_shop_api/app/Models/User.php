@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * 
@@ -71,6 +73,13 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * The directory path where the image is stored
+     * 
+     * @var array
+     */
+    const DIRECTORY_PATH = 'public/hinh-anh/tai-khoan/';
+
+    /**
      * Set avatar base on name after register
      */
     public function setNameAttribute($value)
@@ -80,5 +89,65 @@ class User extends Authenticatable implements MustVerifyEmail
             md5(strtolower($this->attributes['email'])),
             $this->attributes['name'] ? urlencode("https://ui-avatars.com/api/" . $this->attributes['name'] . "") : 'mp',
         ]);
+    }
+
+    /**
+     * Upload image when request has image file
+     * 
+     * @param  integer $id
+     * @param  string $requestName 
+     * @param  file $requestImage
+     * 
+     * @return string 
+     */
+    public static function handleUploadImage($id, $name, $image)
+    {
+        $directory = User::DIRECTORY_PATH . $id;
+        User::removeImageDirectory($id);
+
+        $nameImage = Str::slug($name) . '.' . $image->extension();
+        $pathImage = Storage::putFileAs($directory, $image, $nameImage);
+
+        return Storage::url($pathImage);
+    }
+
+    /**
+     * Rename image when update name
+     * 
+     * @param  integer $id
+     * @param  string $name Current name
+     * @param  string $path Current path image
+     * @param  string $requestName Request name to update  
+     * 
+     * @return string 
+     */
+    public static function renameStorageImage($id, $name,  $path, $requestName)
+    {
+        $directory = User::DIRECTORY_PATH . $id;
+
+        $arrayPathImage = explode('/', $path);
+        $oldNameImage = end($arrayPathImage);
+        $oldPathImage = $directory . '/' . $oldNameImage;
+        $newPathImage = Str::replaceLast(Str::slug($name), Str::slug($requestName), $oldPathImage);
+
+        if ($newPathImage != $oldPathImage) {
+            Storage::move($oldPathImage, $newPathImage);
+        }
+
+        return Storage::url($newPathImage);
+    }
+
+    /**
+     * Remove image folder when delete item
+     * 
+     * @param  integer $id
+     */
+    public static function removeImageDirectory($id)
+    {
+        $directory = User::DIRECTORY_PATH . $id;
+
+        if (Storage::exists($directory)) {
+            Storage::deleteDirectory($directory);
+        }
     }
 }

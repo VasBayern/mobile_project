@@ -129,7 +129,7 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $user = User::where('id', Auth::user()->id)->first();
-            $directory = 'public/hinh-anh/tai-khoan/' . $user->id;
+            $directory = User::DIRECTORY_PATH . $user->id;
 
             if ($request->has('phone')) {
                 $user->phone = $request->phone;
@@ -141,39 +141,22 @@ class UserController extends Controller
                 $user->address = $request->address;
             }
             if ($request->has('birthday')) {
-                $user->birthday = DateTime::createFromFormat('d/m/Y', $request->birthday)->format('Y-m-d H:i:s');
+                $formatDate = config('global.datetime.format');
+                $user->birthday = DateTime::createFromFormat($formatDate['input_date'], $request->birthday)->format($formatDate['current_time']);
             }
             if ($request->has('name')) {
                 $name = $user->name;
+                $avatar = $user->avatar;
                 $requestName = $request->name;
                 $user->name = $requestName;
 
                 if (!$request->hasFile('avatar') && Storage::exists($directory)) {
-                    $oldPathImage = Storage::files($directory)[0];
-                    $oldPathImageArr = explode("/", $oldPathImage);
-                    $oldNameImage = end($oldPathImageArr);
-
-                    $newNameImage = Str::replaceFirst(Str::slug($name), Str::slug($requestName), $oldNameImage);
-                    $newPathImage = $directory . '/' . $newNameImage;
-
-                    if ($newPathImage != $oldPathImage) {
-                        Storage::move($oldPathImage, $newPathImage);
-                        $user->avatar = Storage::url($newPathImage);
-                    }
+                    $user->avatar = User::renameStorageImage($user->id, $name, $avatar, $requestName);
                 }
             }
             if ($request->hasFile('avatar')) {
-                if (Storage::exists($directory)) {
-                    Storage::deleteDirectory($directory);
-                }
                 $userName = $request->has('name') ? $request->name : $user->name;
-                $imageName = Str::slug($userName) . '.' . $request->avatar->extension();
-                $imagePath = Storage::putFileAs(
-                    $directory,
-                    $request->file('avatar'),
-                    $imageName
-                );
-                $user->avatar = Storage::url($imagePath);
+                $user->avatar = User::handleUploadImage($user->id, $userName, $request->avatar);
             }
             $user->save();
             DB::commit();
@@ -219,6 +202,7 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
+            User::removeImageDirectory($id);
             $user->delete();
 
             return $this->respondSuccess('Xóa thành công');

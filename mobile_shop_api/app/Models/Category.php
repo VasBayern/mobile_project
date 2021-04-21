@@ -158,13 +158,13 @@ class Category extends Model
      * 
      * @return string 
      */
-    public static function handleUploadImage($id, $requestName, $requestImage)
+    public static function handleUploadImage($id, $name, $image)
     {
         $directory = Category::DIRECTORY_PATH . $id;
         Category::removeImageDirectory($id);
 
-        $nameImage = Str::slug($requestName) . '.' . $requestImage->extension();
-        $pathImage = Storage::putFileAs($directory, $requestImage, $nameImage);
+        $nameImage = Str::slug($name) . '.' . $image->extension();
+        $pathImage = Storage::putFileAs($directory, $image, $nameImage);
 
         return Storage::url($pathImage);
     }
@@ -186,7 +186,7 @@ class Category extends Model
         $arrayPathImage = explode('/', $path);
         $oldNameImage = end($arrayPathImage);
         $oldPathImage = $directory . '/' . $oldNameImage;
-        $newPathImage = Str::replaceLast($name, Str::slug($requestName), $oldPathImage);
+        $newPathImage = Str::replaceLast(Str::slug($name), Str::slug($requestName), $oldPathImage);
 
         if ($newPathImage != $oldPathImage) {
             Storage::move($oldPathImage, $newPathImage);

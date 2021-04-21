@@ -208,7 +208,7 @@ class CategoryController extends Controller
             $category = Category::findOrFail($id);
             $categoryId = $category->id;
             $categoryImage = $category->image;
-            $categoryName = $category->slug;
+            $categoryName = $category->name;
 
             $category->update($request->all());
 
