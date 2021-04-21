@@ -29,7 +29,19 @@ class Category extends Model
 {
     use HasFactory, SlugByNameTrait;
 
+    /**
+     * The directory path where the image is stored
+     * 
+     * @var array
+     */
     const DIRECTORY_PATH = 'public/hinh-anh/danh-muc/';
+
+    /**
+     * The columns that are used for sorting data
+     * 
+     * @var array
+     */
+    const SORT_COLUMN = ['id', 'name', 'sort_no', 'home', 'image', 'created_at'];
 
     /**
      * The table associated with the model.
@@ -62,8 +74,10 @@ class Category extends Model
      */
     public function scopeOfDate($query, $startDate, $endDate)
     {
-        $fromDate = DateTime::createFromFormat('d/m/Y', $startDate)->format('Y-m-d 00:00:00');
-        $toDate = DateTime::createFromFormat('d/m/Y', $endDate)->format('Y-m-d 23:59:59');
+        $formatDate = config('global.datetime.format');
+
+        $fromDate = DateTime::createFromFormat($formatDate['input_date'], $startDate)->format($formatDate['start_date']);
+        $toDate = DateTime::createFromFormat($formatDate['input_date'], $endDate)->format($formatDate['end_date']);
 
         return $query->whereBetween('created_at', [$fromDate, $toDate]);
     }
@@ -87,27 +101,10 @@ class Category extends Model
      * @param  int  $paginate
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeOfPaginate($query, $paginate)
+    public function scopeOfPaginate($query, $paginateKey)
     {
-        $perPage = 100;
-
-        switch ($paginate) {
-            case 0:
-                $perPage = 10;
-                break;
-            case 1:
-                $perPage = 25;
-                break;
-            case 2:
-                $perPage = 50;
-                break;
-            case 3:
-                $perPage = 100;
-                break;
-            default:
-                $perPage = 100;
-                break;
-        }
+        $paginatationPage = config('global.pagination_page');
+        $perPage = array_key_exists($paginateKey, $paginatationPage) == true ? $paginatationPage[$paginateKey] : $paginatationPage[3];
 
         return $query->paginate($perPage);
     }
@@ -120,33 +117,14 @@ class Category extends Model
      * @param  int  $order
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeOfOrderBy($query, $column, $order)
+    public function scopeOfOrderBy($query, $columnKey, $order)
     {
         $sortOrder = ($order == 1) ? 'DESC' : 'ASC';
-        $sortColumn = '';
 
-        switch ($column) {
-            case 0:
-                $sortColumn = 'id';
-                break;
-            case 1:
-                $sortColumn = 'name';
-                break;
-            case 2:
-                $sortColumn = 'sort_no';
-                break;
-            case 3:
-                $sortColumn = 'home';
-                break;
-            case 4:
-                $sortColumn = 'image';
-                break;
-            case 5:
-                $sortColumn = 'created_at';
-                break;
-            default:
-                throw new Exception("Không tìm thấy trường này");
-                break;
+        if (array_key_exists($columnKey, Category::SORT_COLUMN)) {
+            $sortColumn = Category::SORT_COLUMN[$columnKey];
+        } else {
+            throw new Exception("Không tìm thấy trường này");
         }
 
         return $query->orderBy($sortColumn, $sortOrder);
@@ -161,8 +139,8 @@ class Category extends Model
     public static function getCategoryWithOrder($page)
     {
         $search = isset($page['search']) ? $page['search'] : '';
-        $startDate = isset($page['start_date']) ? $page['start_date'] : '01/01/2000';
-        $endDate = isset($page['end_date']) ? $page['end_date'] : now()->format('d/m/Y');
+        $startDate = isset($page['start_date']) ? $page['start_date'] : config('global.datetime.default_date');
+        $endDate = isset($page['end_date']) ? $page['end_date'] : now()->format(config('global.datetime.format.input_date'));
 
         return Category::ofSearch($search)
             ->ofDate($startDate, $endDate)
@@ -182,9 +160,8 @@ class Category extends Model
     public static function handleUploadImage($id, $requestName, $requestImage)
     {
         $directory = Category::DIRECTORY_PATH . $id;
-        if (Storage::exists($directory)) {
-            Storage::deleteDirectory($directory);
-        }
+        Category::removeImageDirectory($id);
+
         $nameImage = Str::slug($requestName) . '.' . $requestImage->extension();
         $pathImage = Storage::putFileAs($directory, $requestImage, $nameImage);
 
