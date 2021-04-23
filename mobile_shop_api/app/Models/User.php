@@ -16,6 +16,10 @@ use Illuminate\Support\Str;
  *      name="Authentication",
  *      description="Sanctum ToKen Authen",
  * )
+ * @OA\Tag(
+ *      name="Account",
+ *      description="Account Information",
+ * )
  * @OA\Schema(
  *      required={"password"},
  *      @OA\Xml(name="User"),

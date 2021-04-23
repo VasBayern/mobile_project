@@ -21,7 +21,7 @@ class UserController extends Controller
     /**
      * @OA\Get(
      *  path="/user",
-     *  tags={"Authentication"},
+     *  tags={"Account"},
      *  summary="Get Current User Information",
      *  operationId="getUser",
      *  security={
@@ -55,7 +55,7 @@ class UserController extends Controller
     /**
      * @OA\Post(
      *  path="/user/update",
-     *  tags={"Authentication"},
+     *  tags={"Account"},
      *  summary="Update Current User Information",
      *  operationId="updateUser",
      *  security={
@@ -171,7 +171,7 @@ class UserController extends Controller
     /**
      * @OA\Delete(
      *  path="/user/destroy/{id}",
-     *  tags={"Authentication"},
+     *  tags={"Account"},
      *  summary="Delete User Account By ID",
      *  description="Permission: Admin",
      *  operationId="destroyUser",

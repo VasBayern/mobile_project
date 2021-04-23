@@ -20,7 +20,7 @@ class PasswordController extends Controller
     /**
      * @OA\Get(
      *  path="/password/forgot",
-     *  tags={"Authentication"},
+     *  tags={"Account"},
      *  summary="Enter email to reset password",
      *  description="Enter the registration email, then receive link reset password from email",
      *  operationId="forgotPassword",
@@ -75,7 +75,7 @@ class PasswordController extends Controller
     /**
      * @OA\Post(
      *  path="/password/reset",
-     *  tags={"Authentication"},
+     *  tags={"Account"},
      *  summary="Reset Pasword",
      *  description="Enter token from link had been sent to your email to reset password",
      *  operationId="resetPassword",
