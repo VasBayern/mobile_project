@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\VerificationController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -39,5 +40,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::patch('password/change', [PasswordController::class, 'change']);
 });
 
+/** Category */
 Route::apiResource('categories', CategoryController::class);
 Route::get('categories/excel/export', [CategoryController::class, 'export']);
+
+/** Brand */
+Route::apiResource('categories', BrandController::class);
+Route::get('categories/excel/export', [BrandController::class, 'export']);

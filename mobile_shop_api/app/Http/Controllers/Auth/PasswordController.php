@@ -119,7 +119,7 @@ class PasswordController extends Controller
     /**
      * @OA\Patch(
      *  path="/password/change",
-     *  tags={"Authentication"},
+     *  tags={"Account"},
      *  summary="Change Pasword",
      *  operationId="changePassword",
      *  security={
