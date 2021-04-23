@@ -104,7 +104,7 @@
         "/password/forgot": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Account"
                 ],
                 "summary": "Enter email to reset password",
                 "description": "Enter the registration email, then receive link reset password from email",
@@ -140,7 +140,7 @@
         "/password/reset": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Account"
                 ],
                 "summary": "Reset Pasword",
                 "description": "Enter token from link had been sent to your email to reset password",
@@ -326,7 +326,7 @@
         "/user": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Account"
                 ],
                 "summary": "Get Current User Information",
                 "operationId": "getUser",
@@ -360,7 +360,7 @@
         "/user/update": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Account"
                 ],
                 "summary": "Update Current User Information",
                 "operationId": "updateUser",
@@ -446,7 +446,7 @@
         "/user/destroy/{id}": {
             "delete": {
                 "tags": [
-                    "Authentication"
+                    "Account"
                 ],
                 "summary": "Delete User Account By ID",
                 "description": "Permission: Admin",
@@ -485,7 +485,7 @@
         "/email/verify/{id}": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Account"
                 ],
                 "summary": "Verify Email After Register",
                 "description": "Verify account by link had been received from email",
@@ -552,7 +552,7 @@
         "/email/resend": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Account"
                 ],
                 "summary": "Resend Email To Verify",
                 "operationId": "resendEmail",

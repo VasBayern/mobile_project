@@ -25,7 +25,7 @@ class VerificationController extends Controller
     /**
      * @OA\Get(
      *  path="/email/verify/{id}",
-     *  tags={"Authentication"},
+     *  tags={"Account"},
      *  summary="Verify Email After Register",
      *  operationId="verifyEmail",
      *  description="Verify account by link had been received from email",
@@ -99,7 +99,7 @@ class VerificationController extends Controller
     /**
      * @OA\Get(
      *  path="/email/resend",
-     *  tags={"Authentication"},
+     *  tags={"Account"},
      *  summary="Resend Email To Verify",
      *  operationId="resendEmail",
      *  security={
