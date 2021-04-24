@@ -24,7 +24,7 @@ class StoreBrandRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'      => 'required|string|unique:categories,name',
+            'name'      => 'required|string|unique:brands,name',
             'image'     => 'required|mimes:jpeg,jpg,png,gif',
             'sort_no'   => 'required|numeric',
             'home'      => 'required|integer',    // 0: False, 1: True
