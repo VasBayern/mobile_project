@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\RamController;
+use App\Http\Controllers\RomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,3 +56,11 @@ Route::get('categories/excel/export', [CategoryController::class, 'export']);
 /** Brand */
 Route::apiResource('brands', BrandController::class);
 Route::get('brands/excel/export', [BrandController::class, 'export']);
+
+/** Ram */
+Route::apiResource('rams', RamController::class);
+Route::get('rams/excel/export', [RamController::class, 'export']);
+
+/** Rom */
+Route::apiResource('roms', RomController::class);
+Route::get('roms/excel/export', [RomController::class, 'export']);

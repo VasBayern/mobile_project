@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CategorySeeder::class,
             BrandSeeder::class,
+            RamSeeder::class,
+            RomSeeder::class,
         ]);
     }
 }

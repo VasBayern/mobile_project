@@ -283,9 +283,7 @@ class CategoryController extends Controller
      *  @OA\Parameter(name="start_date", in="query", required=false, description="start date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
      *  @OA\Parameter(name="end_date", in="query", required=false, description="end date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
      *  @OA\Parameter(name="search", in="query", required=false, description="search by name", @OA\Schema(type="string")),
-     *  @OA\Response(response=200, description="Success",
-
-     *  ),
+     *  @OA\Response(response=200, description="Success"),
      *  @OA\Response(response=400,description="Bad Request"),
      *  @OA\Response(response=401,description="Unauthenticated"),
      *)
