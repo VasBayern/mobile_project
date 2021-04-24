@@ -54,7 +54,7 @@ FromCollection,
     {
         return [
             'ID',
-            'Tên danh mục',
+            'Tên hãng sản xuất',
             'Ảnh',
             'Hiển thị',
             'Thứ tự',

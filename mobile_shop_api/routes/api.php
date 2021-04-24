@@ -21,22 +21,29 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+/** Authentication */
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [LoginController::class, 'login']);
 
+/** Forgot password */
 Route::get('password/forgot', [PasswordController::class, 'forgot']);
 Route::post('password/reset', [PasswordController::class, 'reset']);
 Route::get('password/token', [PasswordController::class, 'getToken'])->name('password.reset');
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
+    /** User account */
     Route::get('user', [UserController::class, 'getUser']);
     Route::put('user/update', [UserController::class, 'update']);
     Route::delete('user/destroy/{id}', [UserController::class, 'destroy']);
+    
+    /** Logout */
     Route::post('logout', [LoginController::class, 'logout']);
 
+    /** Email verification */
     Route::get('email/verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify');
     Route::get('email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
 
+    /** Change password */
     Route::patch('password/change', [PasswordController::class, 'change']);
 });
 
@@ -45,5 +52,5 @@ Route::apiResource('categories', CategoryController::class);
 Route::get('categories/excel/export', [CategoryController::class, 'export']);
 
 /** Brand */
-Route::apiResource('categories', BrandController::class);
-Route::get('categories/excel/export', [BrandController::class, 'export']);
+Route::apiResource('brands', BrandController::class);
+Route::get('brands/excel/export', [BrandController::class, 'export']);
