@@ -20,13 +20,26 @@ class RamExport implements
     WithColumnWidths
 {
     /**
+     * Instantiate a new controller instance
+     *
+     * @param  array $condition
+     * @param  int $page
+     * 
+     * @return void
+     */
+    public function __construct(array $condition)
+    {
+        $this->condition = $condition;
+    }
+
+    /**
      * Get ram collection with condition
      * 
      * @return \Illuminate\Support\Collection
      */
     public function collection()
     {
-        return Ram::all();
+        return (new Ram())->getRamWithOrder($this->condition);
     }
 
     /**

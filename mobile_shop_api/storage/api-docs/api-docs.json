@@ -1524,6 +1524,82 @@
                 ],
                 "summary": "Get All Ram",
                 "operationId": "getRams",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "sort by column: 0-id, 1-name, 2-created_at",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort by order: 0-ASC, 1-DESC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "sort by paginate page: 0-10, 1-25, 2-50, 3-100",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "start date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "end date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "search by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -1540,6 +1616,9 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request"
+                    },
                     "401": {
                         "description": "Unauthenticated"
                     }
@@ -1554,7 +1633,7 @@
                 "tags": [
                     "Ram"
                 ],
-                "summary": "Add Ram With Form Data",
+                "summary": "Add Ram",
                 "operationId": "storeRam",
                 "requestBody": {
                     "required": true,
@@ -1658,7 +1737,7 @@
                 "tags": [
                     "Ram"
                 ],
-                "summary": "Update Ram With Form Data",
+                "summary": "Update Ram",
                 "operationId": "updateRam",
                 "parameters": [
                     {
@@ -1772,9 +1851,88 @@
                 ],
                 "summary": "Export Excel Ram",
                 "operationId": "exportRam",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "sort by column: 0-id, 1-name, 2-created_at",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort by order: 0-ASC, 1-DESC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "sort by paginate page: 0-10, 1-25, 2-50, 3-100",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "start date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "end date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "search by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -1824,7 +1982,7 @@
                 "tags": [
                     "Rom"
                 ],
-                "summary": "Add Rom With Form Data",
+                "summary": "Add Rom",
                 "operationId": "storeRom",
                 "requestBody": {
                     "required": true,
@@ -1928,7 +2086,7 @@
                 "tags": [
                     "Rom"
                 ],
-                "summary": "Update Rom With Form Data",
+                "summary": "Update Rom",
                 "operationId": "updateRom",
                 "parameters": [
                     {

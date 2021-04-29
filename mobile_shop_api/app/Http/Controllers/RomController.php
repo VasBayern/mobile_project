@@ -39,11 +39,18 @@ class RomController extends Controller
      *  security={
      *      {"bearerAuth": {}}
      *  },
+     *  @OA\Parameter(name="sort", in="query", required=true, description="sort by column: 0-id, 1-name, 2-created_at", @OA\Schema(type="integer", default="0", enum={0,1,2})),
+     *  @OA\Parameter(name="order", in="query", required=true, description="sort by order: 0-ASC, 1-DESC", @OA\Schema(type="integer", default="0", enum={0,1})),
+     *  @OA\Parameter(name="per_page", in="query", required=true, description="sort by paginate page: 0-10, 1-25, 2-50, 3-100", @OA\Schema(type="integer", default="0", enum={0,1,2,3})),
+     *  @OA\Parameter(name="start_date", in="query", required=false, description="start date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
+     *  @OA\Parameter(name="end_date", in="query", required=false, description="end date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
+     *  @OA\Parameter(name="search", in="query", required=false, description="search by name", @OA\Schema(type="string")),
      *  @OA\Response(response=200, description="Success",
      *     @OA\JsonContent(
      *        @OA\Property(property="data", type="object", ref="#/components/schemas/Rom"),
      *     )
      *  ),
+     *  @OA\Response(response=400,description="Bad Request"),
      *  @OA\Response(response=401,description="Unauthenticated"),
      *)
      **/
@@ -52,10 +59,11 @@ class RomController extends Controller
      * 
      * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $roms = Rom::paginate(10);
+            $condition = $request->all();
+            $rams = (new Rom())->getRamWithOrder($condition);
 
             return $this->respondWithResourceCollection(RomResource::collection($roms));
         } catch (Exception $exception) {
@@ -238,16 +246,24 @@ class RomController extends Controller
      *  security={
      *      {"bearerAuth": {}}
      *  },
+     *  @OA\Parameter(name="sort", in="query", required=true, description="sort by column: 0-id, 1-name, 2-created_at", @OA\Schema(type="integer", default="0", enum={0,1,2})),
+     *  @OA\Parameter(name="order", in="query", required=true, description="sort by order: 0-ASC, 1-DESC", @OA\Schema(type="integer", default="0", enum={0,1})),
+     *  @OA\Parameter(name="per_page", in="query", required=true, description="sort by paginate page: 0-10, 1-25, 2-50, 3-100", @OA\Schema(type="integer", default="0", enum={0,1,2,3})),
+     *  @OA\Parameter(name="start_date", in="query", required=false, description="start date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
+     *  @OA\Parameter(name="end_date", in="query", required=false, description="end date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
+     *  @OA\Parameter(name="search", in="query", required=false, description="search by name", @OA\Schema(type="string")),
      *  @OA\Response(response=200, description="Success"),
+     *  @OA\Response(response=400,description="Bad Request"),
      *  @OA\Response(response=401,description="Unauthenticated"),
      *)
      **/
-    public function export()
+    public function export(Request $request)
     {
         try {
+            $condition = $request->all();
             $fileName = 'dung-luong-' . now()->format('dmY-his') . '.xlsx';
 
-            return $this->excel->download(new RomExport(), $fileName);
+            return $this->excel->download(new RomExport($condition), $fileName);
         } catch (Exception $exception) {
             return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
         }

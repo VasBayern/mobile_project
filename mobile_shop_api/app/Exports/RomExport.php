@@ -20,13 +20,26 @@ class RomExport implements
     WithColumnWidths
 {
     /**
+     * Instantiate a new controller instance
+     *
+     * @param  array $condition
+     * @param  int $page
+     * 
+     * @return void
+     */
+    public function __construct(array $condition)
+    {
+        $this->condition = $condition;
+    }
+
+    /**
      * Get rom collection with condition
      * 
      * @return \Illuminate\Support\Collection
      */
     public function collection()
     {
-        return Rom::all();
+        return (new Rom())->getRomWithOrder($this->condition);
     }
 
     /**

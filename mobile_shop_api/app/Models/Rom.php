@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\ConditionQueryTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,7 +19,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Rom extends Model
 {
-    use HasFactory;
+    use HasFactory, ConditionQueryTrait;
+
+    /**
+     * The columns that are used for sorting data
+     * 
+     * @var array
+     */
+    const SORT_COLUMN = ['id', 'name', 'created_at'];
 
     /**
      * The table associated with the model.
@@ -33,4 +41,15 @@ class Rom extends Model
      * @var array
      */
     protected $fillable = ['name'];
+
+    /**
+     * filter rom with condition
+     * @param array $condition
+     * 
+     * @return collection
+     */
+    public function getRomWithOrder($condition)
+    {
+        return $this->getCollectionDataWithOrder($condition, Rom::SORT_COLUMN);
+    }
 }

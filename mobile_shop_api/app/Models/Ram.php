@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\ConditionQueryTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,7 +19,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Ram extends Model
 {
-    use HasFactory;
+    use HasFactory, ConditionQueryTrait;
+
+    /**
+     * The columns that are used for sorting data
+     * 
+     * @var array
+     */
+    const SORT_COLUMN = ['id', 'name', 'created_at'];
 
     /**
      * The table associated with the model.
@@ -33,4 +41,15 @@ class Ram extends Model
      * @var array
      */
     protected $fillable = ['name'];
+
+    /**
+     * filter ram with condition
+     * @param array $condition
+     * 
+     * @return collection
+     */
+    public function getRamWithOrder($condition)
+    {
+        return $this->getCollectionDataWithOrder($condition, Ram::SORT_COLUMN);
+    }
 }
