@@ -24,8 +24,8 @@ class Controller extends BaseController
      * )
      *
      * @OA\Server(
-     *      url="http://127.0.0.1:8000/api",
-     *      description="API Server"
+     *      url="http://localhost/api",
+     *      description="API Server Mobile Shop"
      * )
      * 
      * @OA\SecurityScheme(
