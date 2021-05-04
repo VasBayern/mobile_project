@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @OA\Tag(
  *      name="Brand",
- *      description="Brand Information Of Project",
  * )
  * @OA\Schema(
  *      title="Brand",

@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @OA\Tag(
  *      name="Category",
- *      description="Category Information Of Project",
  * )
  * @OA\Schema(
  *      title="Category",

@@ -18,7 +18,6 @@ use Illuminate\Support\Str;
  * )
  * @OA\Tag(
  *      name="Account",
- *      description="Account Information",
  * )
  * @OA\Schema(
  *      required={"password"},
