@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             BrandSeeder::class,
             RamSeeder::class,
             RomSeeder::class,
+            ColorSeeder::class,
         ]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use DateTime;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 trait ConditionQueryTrait
 {
@@ -76,6 +77,9 @@ trait ConditionQueryTrait
             throw new Exception("Không tìm thấy trường này");
         }
 
+        if ($sortColumn == 'sort_no') {
+            return $query->orderBy(DB::raw('ABS(' . $sortColumn . ')'), $sortOrder);
+        }
         return $query->orderBy($sortColumn, $sortOrder);
     }
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ColorController;
 use App\Http\Controllers\RamController;
 use App\Http\Controllers\RomController;
 use Illuminate\Http\Request;
@@ -64,3 +65,7 @@ Route::get('rams/excel/export', [RamController::class, 'export']);
 /** Rom */
 Route::apiResource('roms', RomController::class);
 Route::get('roms/excel/export', [RomController::class, 'export']);
+
+/** Color */
+Route::apiResource('colors', ColorController::class);
+Route::get('colors/excel/export', [ColorController::class, 'export']);
