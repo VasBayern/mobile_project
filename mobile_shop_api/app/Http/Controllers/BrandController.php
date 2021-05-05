@@ -292,7 +292,7 @@ class BrandController extends Controller
     {
         try {
             $condition = $request->all();
-            $fileName = 'hang-san-xuat-' . now()->format('dmY-his') . '.xlsx';
+            $fileName = 'hang-san-xuat-' . now()->format('d-m-Y-his') . '.xlsx';
 
             return $this->excel->download(new BrandMultiSheetExport($condition), $fileName);
         } catch (Exception $exception) {

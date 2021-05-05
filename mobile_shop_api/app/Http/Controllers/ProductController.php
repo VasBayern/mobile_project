@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\ColorExport;
-use App\Http\Requests\Color\StoreColorRequest;
-use App\Http\Requests\Color\UpdateColorRequest;
-use App\Http\Resources\ColorResource;
-use App\Models\Color;
+use App\Exports\ProductMultiSheetExport;
+use App\Http\Requests\Product\StoreProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
+use App\Http\Resources\ProductDetailResource;
+use App\Http\Resources\ProductResource;
+use App\Models\Product;
 use App\Traits\ApiResponseTrait;
 use App\Traits\HandleImageTrait;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Excel;
 
-class ColorController extends Controller
+class ProductController extends Controller
 {
     use ApiResponseTrait, HandleImageTrait;
 
@@ -33,14 +33,14 @@ class ColorController extends Controller
 
     /**
      * @OA\Get(
-     *  path="/colors",
-     *  tags={"Color"},
-     *  summary="Get All Color",
-     *  operationId="getColors",
+     *  path="/products",
+     *  tags={"Product"},
+     *  summary="Get All Product",
+     *  operationId="getProducts",
      *  security={
      *      {"bearerAuth": {}}
      *  },
-     *  @OA\Parameter(name="sort", in="query", required=true, description="sort by column: 0-id, 1-name, 2-code, 3-created_at", @OA\Schema(type="integer", default="0", enum={0,1,2,3})),
+     *  @OA\Parameter(name="sort", in="query", required=true, description="sort by column: 0-id, 1-name, 2-price_core, 3-price, 4-sort_no, 5-home, 6-new, 7-created_at", @OA\Schema(type="integer", default="0", enum={0,1,2,3,4,5,6,7})),
      *  @OA\Parameter(name="order", in="query", required=true, description="sort by order: 0-ASC, 1-DESC", @OA\Schema(type="integer", default="0", enum={0,1})),
      *  @OA\Parameter(name="per_page", in="query", required=true, description="sort by paginate page: 0-10, 1-25, 2-50, 3-100", @OA\Schema(type="integer", default="0", enum={0,1,2,3})),
      *  @OA\Parameter(name="start_date", in="query", required=false, description="start date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
@@ -48,7 +48,7 @@ class ColorController extends Controller
      *  @OA\Parameter(name="search", in="query", required=false, description="search by name", @OA\Schema(type="string")),
      *  @OA\Response(response=200, description="Success",
      *     @OA\JsonContent(
-     *        @OA\Property(property="data", type="object", ref="#/components/schemas/Color"),
+     *        @OA\Property(property="data", type="object", ref="#/components/schemas/Product"),
      *     )
      *  ),
      *  @OA\Response(response=400,description="Bad Request"),
@@ -65,35 +65,58 @@ class ColorController extends Controller
     {
         try {
             $condition = $request->all();
-            $colors = (new Color())->getColorWithOrder($condition);
+            $products = (new Product())->getProductWithOrder($condition);
 
-            return $this->respondWithResourceCollection(ColorResource::collection($colors));
+            return $this->respondWithResourceCollection(ProductResource::collection($products));
         } catch (Exception $exception) {
             return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
         }
     }
 
     /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
      * @OA\Post(
-     *  path="/colors",
-     *  tags={"Color"},
-     *  summary="Add Color With Form Data",
-     *  operationId="storeColor",
+     *  path="/products",
+     *  tags={"Product"},
+     *  summary="Add Product With Form Data",
+     *  operationId="storeProduct",
      *  security={
      *      {"bearerAuth": {}}
      *  },
      * 
      *  @OA\RequestBody(
-     *      required=true,
-     *      @OA\JsonContent(
-     *          required={"name", "code"},
-     *          @OA\Property(property="name", type="string", example="Đỏ"),
-     *          @OA\Property(property="code", type="string", example="#ff0000"),
-     *      ),
+     *      @OA\MediaType(
+     *          mediaType="multipart/form-data",
+     *          @OA\Schema(
+     *              required={"name", "category_id", "brand_id", "price_core", "price", "sort_no", "home", "new", "images", "introduction", "additional_incentives", "description", "specification"},
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="category_id", type="integer"),
+     *              @OA\Property(property="brand_id", type="integer"),
+     *              @OA\Property(property="price_core", type="number", multipleOf=1000),
+     *              @OA\Property(property="price", type="number", multipleOf=1000),
+     *              @OA\Property(property="sort_no", type="integer", default=0),
+     *              @OA\Property(property="home", type="string", default="0", enum={"0", "1"}, description="Show in homepage => 0: False, 1: True",),
+     *              @OA\Property(property="new", type="string", default="0", enum={"0", "1"}, description="New product => 0: False, 1: True",),
+     *              @OA\Property(property="introduction", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
+     *              @OA\Property(property="additional_incentives", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
+     *              @OA\Property(property="description", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
+     *              @OA\Property(property="specification", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
+     *              @OA\Property(property="images", type="array", items={ "type": "string", "format"="binary", "collectionFomrat"="multi"}),
+     *          )
+     *      )
      *  ),
      *  @OA\Response(response=201, description="Success",
      *      @OA\JsonContent(
-     *          @OA\Property(property="data", type="object", ref="#/components/schemas/Color"),
+     *          @OA\Property(property="data", type="object", ref="#/components/schemas/Product"),
      *      )
      *  ),
      *  @OA\Response(response=401,description="Unauthenticated"),
@@ -104,23 +127,20 @@ class ColorController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\Color\StoreColorRequest $request
+     * @param  \App\Http\Requests\Product\StoreProductRequest $request
      * 
      * @return JsonResponse
      */
-    public function store(StoreColorRequest $request)
+    public function store(StoreProductRequest $request)
     {
-        $color = Color::create($request->all());
-
-        return $this->respondWithResource(new ColorResource($color), 'Thêm thành công', 201);
     }
 
     /**
      * @OA\Get(
-     *  path="/colors/{id}",
-     *  tags={"Color"},
-     *  summary="Find Color By ID",
-     *  operationId="showColor",
+     *  path="/products/{id}",
+     *  tags={"Product"},
+     *  summary="Find Product By ID",
+     *  operationId="showProduct",
      *  security={
      *      {"bearerAuth": {}}
      *  },
@@ -128,7 +148,7 @@ class ColorController extends Controller
      *  @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *  @OA\Response(response=200, description="Success",
      *      @OA\JsonContent(
-     *          @OA\Property(property="data", type="object", ref="#/components/schemas/Color"),
+     *          @OA\Property(property="data", type="object", ref="#/components/schemas/Product"),
      *      )
      *  ),
      *  @OA\Response(response=401,description="Unauthenticated"),
@@ -145,73 +165,43 @@ class ColorController extends Controller
     public function show($id)
     {
         try {
-            $color = Color::findOrFail($id);
-            return $this->respondWithResource(new ColorResource($color));
+            $product = Product::findOrFail($id);
+            return $this->respondWithResource(new ProductDetailResource($product));
         } catch (Exception $exception) {
             return $this->respondNotFound($exception, 'ID không tồn tại!');
         }
     }
 
     /**
-     * @OA\Put(
-     *  path="/colors/{id}",
-     *  tags={"Color"},
-     *  summary="Update Color With Form Data",
-     *  operationId="updateColor",
-     *  security={
-     *      {"bearerAuth": {}}
-     *  },
-     * 
-     *  @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer",)),
-     *  @OA\RequestBody(
-     *      required=true,
-     *      @OA\JsonContent(
-     *          required={"name", "code", "_method"},
-     *          @OA\Property(property="name", type="string", example="Đỏ"),
-     *          @OA\Property(property="code", type="string", example="#ff0000"),
-     *      ),
-     *  ),
-     *  @OA\Response(response=200, description="Success",
-     *      @OA\JsonContent(
-     *          @OA\Property(property="data", type="object", ref="#/components/schemas/Color"),
-     *      )
-     *  ),
-     *  @OA\Response(response=401,description="Unauthenticated"),
-     *  @OA\Response(response=403,description="Forbidden"),
-     *  @OA\Response(response=404,description="Not found"),
-     *  @OA\Response(response=405,description="Method not allow"),
-     *  @OA\Response(response=422,description="Unprocessable entity"),
-     *)
-     */
-    /**
-     * Update the specified resource in storage.
+     * Show the form for editing the specified resource.
      *
-     * @param  \App\Http\Requests\Color\UpdateColorRequest $request
-     * @param  int  $id
+     * @param  \App\Http\Requests\Product\UpdateProductRequest $request
      * 
      * @return JsonResponse
      */
-    public function update(UpdateColorRequest $request, $id)
+    public function edit(UpdateProductRequest $request, $id)
     {
-        DB::beginTransaction();
-        try {
-            $color = Color::findOrFail($id);
-            $color->update($request->all());
-            DB::commit();
+        //
+    }
 
-            return $this->respondWithResource(new ColorResource($color), 'Sửa thành công');
-        } catch (Exception $exception) {
-            DB::rollBack();
-            return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
-        }
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
     }
 
     /**
      * @OA\Delete(
-     *  path="/colors/{id}",
-     *  tags={"Color"},
-     *  summary="Delete Color By ID",
-     *  operationId="destroyColor",
+     *  path="/products/{id}",
+     *  tags={"Product"},
+     *  summary="Delete Product By ID",
+     *  operationId="destroyProduct",
      *  security={
      *      {"bearerAuth": {}}
      *  },
@@ -225,15 +215,18 @@ class ColorController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * 
      * @return JsonResponse
      */
     public function destroy($id)
     {
         try {
-            $color = Color::findOrFail($id);
-            $color->delete();
+            $product = Product::findOrFail($id);
+            $directory = Product::DIRECTORY_PATH . $id;
+            $this->removeImageDirectory($directory);
+
+            $product->delete();
 
             return $this->respondSuccess('Xoá thành công');
         } catch (Exception $exception) {
@@ -243,31 +236,42 @@ class ColorController extends Controller
 
     /**
      * @OA\Get(
-     *  path="/colors/excel/export",
-     *  tags={"Color"},
-     *  summary="Export Excel Color",
-     *  operationId="exportColor",
+     *  path="/products/excel/export",
+     *  tags={"Product"},
+     *  summary="Export Excel Product",
+     *  operationId="exportProduct",
      *  security={
      *      {"bearerAuth": {}}
      *  },
-     *  @OA\Parameter(name="sort", in="query", required=true, description="sort by column: 0-id, 1-name, 2-code, 3-created_at", @OA\Schema(type="integer", default="0", enum={0,1,2,3})),
+     *  @OA\Parameter(name="sort", in="query", required=true, description="sort by column: 0-id, 1-name, 2-price_core, 3-price, 4-sort_no, 5-home, 6-new, 7-created_at", @OA\Schema(type="integer", default="0", enum={0,1,2,3,4,5,6,7})),
      *  @OA\Parameter(name="order", in="query", required=true, description="sort by order: 0-ASC, 1-DESC", @OA\Schema(type="integer", default="0", enum={0,1})),
      *  @OA\Parameter(name="per_page", in="query", required=true, description="sort by paginate page: 0-10, 1-25, 2-50, 3-100", @OA\Schema(type="integer", default="0", enum={0,1,2,3})),
      *  @OA\Parameter(name="start_date", in="query", required=false, description="start date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
      *  @OA\Parameter(name="end_date", in="query", required=false, description="end date to filter (dd/mm/yyyy)", @OA\Schema(type="string", format="date")),
      *  @OA\Parameter(name="search", in="query", required=false, description="search by name", @OA\Schema(type="string")),
-     *  @OA\Response(response=200, description="Success"),
+     *  @OA\Response(response=200, description="Success",
+     *     @OA\JsonContent(
+     *        @OA\Property(property="data", type="object", ref="#/components/schemas/Product"),
+     *     )
+     *  ),
      *  @OA\Response(response=400,description="Bad Request"),
      *  @OA\Response(response=401,description="Unauthenticated"),
      *)
-     **/
+     */
+    /**
+     * Export excel product
+     * 
+     * @param  \Illuminate\Http\Request $request
+     * 
+     * @return excel
+     */
     public function export(Request $request)
     {
         try {
             $condition = $request->all();
-            $fileName = 'mau-sac-' . now()->format('d-m-Y-his') . '.xlsx';
+            $fileName = 'san-pham-' . now()->format('d-m-Y-his') . '.xlsx';
 
-            return $this->excel->download(new ColorExport($condition), $fileName);
+            return $this->excel->download(new ProductMultiSheetExport($condition), $fileName);
         } catch (Exception $exception) {
             return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
         }

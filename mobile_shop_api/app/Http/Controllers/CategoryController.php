@@ -292,7 +292,7 @@ class CategoryController extends Controller
     {
         try {
             $condition = $request->all();
-            $fileName = 'danh-muc-' . now()->format('dmY-his') . '.xlsx';
+            $fileName = 'danh-muc-' . now()->format('d-m-Y-his') . '.xlsx';
 
             return $this->excel->download(new CategoryMultiSheetExport($condition), $fileName);
         } catch (Exception $exception) {
