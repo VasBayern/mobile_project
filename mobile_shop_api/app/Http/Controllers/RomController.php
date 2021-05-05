@@ -63,7 +63,7 @@ class RomController extends Controller
     {
         try {
             $condition = $request->all();
-            $rams = (new Rom())->getRamWithOrder($condition);
+            $roms = (new Rom())->getRamWithOrder($condition);
 
             return $this->respondWithResourceCollection(RomResource::collection($roms));
         } catch (Exception $exception) {
