@@ -718,11 +718,11 @@
                                     },
                                     "home": {
                                         "description": "Show in homepage => 0: False, 1: True",
-                                        "type": "integer",
+                                        "type": "string",
                                         "default": "0",
                                         "enum": [
-                                            0,
-                                            1
+                                            "0",
+                                            "1"
                                         ]
                                     },
                                     "image": {
@@ -849,10 +849,11 @@
                                     },
                                     "home": {
                                         "description": "Show in homepage => 0: False, 1: True",
-                                        "type": "integer",
+                                        "type": "string",
+                                        "default": "0",
                                         "enum": [
-                                            0,
-                                            1
+                                            "0",
+                                            "1"
                                         ]
                                     },
                                     "image": {
@@ -1188,11 +1189,11 @@
                                     },
                                     "home": {
                                         "description": "Show in homepage => 0: False, 1: True",
-                                        "type": "integer",
+                                        "type": "string",
                                         "default": "0",
                                         "enum": [
-                                            0,
-                                            1
+                                            "0",
+                                            "1"
                                         ]
                                     },
                                     "image": {
@@ -1319,10 +1320,11 @@
                                     },
                                     "home": {
                                         "description": "Show in homepage => 0: False, 1: True",
-                                        "type": "integer",
+                                        "type": "string",
+                                        "default": "0",
                                         "enum": [
-                                            0,
-                                            1
+                                            "0",
+                                            "1"
                                         ]
                                     },
                                     "image": {
@@ -2155,12 +2157,11 @@
                                         "type": "string",
                                         "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
                                     },
-                                    "images": {
+                                    "images[]": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
-                                            "format": "binary",
-                                            "collectionFomrat": "multi"
+                                            "format": "binary"
                                         }
                                     }
                                 },
@@ -2240,6 +2241,145 @@
                     },
                     "404": {
                         "description": "Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Update Product With Form Data",
+                "operationId": "updateProduct",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "category_id",
+                                    "brand_id",
+                                    "price_core",
+                                    "price",
+                                    "sort_no",
+                                    "home",
+                                    "new",
+                                    "introduction",
+                                    "additional_incentives",
+                                    "description",
+                                    "specification",
+                                    "_method"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "category_id": {
+                                        "type": "integer"
+                                    },
+                                    "brand_id": {
+                                        "type": "integer"
+                                    },
+                                    "price_core": {
+                                        "type": "number",
+                                        "multipleOf": 1000
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "multipleOf": 1000
+                                    },
+                                    "sort_no": {
+                                        "type": "integer",
+                                        "default": 0
+                                    },
+                                    "home": {
+                                        "description": "Show in homepage => 0: False, 1: True",
+                                        "type": "string",
+                                        "default": "0",
+                                        "enum": [
+                                            "0",
+                                            "1"
+                                        ]
+                                    },
+                                    "new": {
+                                        "description": "New product => 0: False, 1: True",
+                                        "type": "string",
+                                        "default": "0",
+                                        "enum": [
+                                            "0",
+                                            "1"
+                                        ]
+                                    },
+                                    "introduction": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "additional_incentives": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "specification": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "_method": {
+                                        "type": "string",
+                                        "default": "PUT"
+                                    },
+                                    "delete_images": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity"
                     }
                 },
                 "security": [

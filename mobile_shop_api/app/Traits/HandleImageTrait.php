@@ -33,8 +33,6 @@ trait HandleImageTrait
      */
     protected function handleUploadImage($directory, $name, $image)
     {
-        $this->removeImageDirectory($directory);
-
         $nameImage = Str::slug($name) . '.' . $image->extension();
         $pathImage = Storage::putFileAs($directory, $image, $nameImage);
 

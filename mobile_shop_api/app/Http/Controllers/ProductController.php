@@ -7,11 +7,13 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResource;
+use App\Models\ImageProduct;
 use App\Models\Product;
 use App\Traits\ApiResponseTrait;
 use App\Traits\HandleImageTrait;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Excel;
 
 class ProductController extends Controller
@@ -110,7 +112,7 @@ class ProductController extends Controller
      *              @OA\Property(property="additional_incentives", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
      *              @OA\Property(property="description", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
      *              @OA\Property(property="specification", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
-     *              @OA\Property(property="images", type="array", items={ "type": "string", "format"="binary", "collectionFomrat"="multi"}),
+     *              @OA\Property(property="images[]", type="array", items={"type": "string", "format"="binary"}),
      *          )
      *      )
      *  ),
@@ -133,6 +135,29 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
+        DB::beginTransaction();
+        try {
+            $product = Product::create($request->all());
+
+            if ($request->hasFile('images')) {
+                $directory = Product::DIRECTORY_PATH . $product->id;
+                foreach ($request->file('images') as $key => $file) {
+                    $imageName = $key == 0 ? $request->name : $request->name . '-' . $key;
+                    $path = $this->handleUploadImage($directory, $imageName, $file);
+
+                    ImageProduct::create([
+                        'product_id' => $product->id,
+                        'path' => $path
+                    ]);
+                }
+            }
+            DB::commit();
+
+            return $this->respondWithResource(new ProductDetailResource($product), 'Thêm thành công', 201);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
+        }
     }
 
     /**
@@ -175,25 +200,79 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Http\Requests\Product\UpdateProductRequest $request
+     * @param  \Illuminate\Http\Request  $request
      * 
      * @return JsonResponse
      */
-    public function edit(UpdateProductRequest $request, $id)
+    public function edit(Request $request, $id)
     {
         //
     }
 
     /**
+     * @OA\Post(
+     *  path="/products/{id}",
+     *  tags={"Product"},
+     *  summary="Update Product With Form Data",
+     *  operationId="updateProduct",
+     *  security={
+     *      {"bearerAuth": {}}
+     *  },
+     *  @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer",)),
+     *  @OA\RequestBody(
+     *      @OA\MediaType(
+     *          mediaType="multipart/form-data",
+     *          @OA\Schema(
+     *              required={"name", "category_id", "brand_id", "price_core", "price", "sort_no", "home", "new", "introduction", "additional_incentives", "description", "specification", "_method"},
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="category_id", type="integer"),
+     *              @OA\Property(property="brand_id", type="integer"),
+     *              @OA\Property(property="price_core", type="number", multipleOf=1000),
+     *              @OA\Property(property="price", type="number", multipleOf=1000),
+     *              @OA\Property(property="sort_no", type="integer", default=0),
+     *              @OA\Property(property="home", type="string", default="0", enum={"0", "1"}, description="Show in homepage => 0: False, 1: True",),
+     *              @OA\Property(property="new", type="string", default="0", enum={"0", "1"}, description="New product => 0: False, 1: True",),
+     *              @OA\Property(property="introduction", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
+     *              @OA\Property(property="additional_incentives", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
+     *              @OA\Property(property="description", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
+     *              @OA\Property(property="specification", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
+     *              @OA\Property(property="_method", type="string", default="PUT"),
+     *              
+     *              @OA\Property(property="delete_images", type="array", items={"type": "string"}),
+     *          )
+     *      )
+     *  ),
+     *  @OA\Response(response=201, description="Success",
+     *      @OA\JsonContent(
+     *          @OA\Property(property="data", type="object", ref="#/components/schemas/Product"),
+     *      )
+     *  ),
+     *  @OA\Response(response=401,description="Unauthenticated"),
+     *  @OA\Response(response=403,description="Forbidden"),
+     *  @OA\Response(response=422,description="Unprocessable entity"),
+     *)
+     **/
+    /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\Product\UpdateProductRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateProductRequest $request, $id)
     {
-        //
+        DB::beginTransaction();
+        try {
+            $product = Product::findOrFail($id);
+            $product->update($request->all());
+
+            DB::commit();
+
+            return $this->respondWithResource(new ProductDetailResource($product), 'Sửa thành công');
+        } catch (Exception $exception) {
+            DB::rollBack();
+            return $this->respondError($exception, 'Có lỗi xảy ra. Vui lòng thử lại!');
+        }
     }
 
     /**

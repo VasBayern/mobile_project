@@ -29,7 +29,6 @@ class UpdateProductRequest extends FormRequest
             'brand_id'      => 'required|integer',
             'price_core'    => 'required|numeric|multiple_of:1000',
             'price'         => 'required|numeric|multiple_of:1000',
-            'images'        => 'required|mimes:jpeg,jpg,png,gif',
             'sort_no'       => 'required|numeric',
             'home'          => 'required|integer',    // 0: False, 1: True
             'new'           => 'required|integer',    // 0: False, 1: True
@@ -37,6 +36,7 @@ class UpdateProductRequest extends FormRequest
             'additional_incentives' => 'required|string',
             'description'   => 'required|string',
             'specification' => 'required|string',
+            // 'images'        => 'mimes:jpeg,jpg,png,gif',
         ];
     }
 
