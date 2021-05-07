@@ -135,7 +135,6 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        return response()->json(count($request->file('images')));
         DB::beginTransaction();
         try {
             $product = Product::create($request->all());
@@ -256,8 +255,7 @@ class ProductController extends Controller
             $product->update($request->all());
 
             $directory = Product::DIRECTORY_PATH . $id;
-            return response()->json(($request->delete_images));
-            return response()->json(count($request->delete_images));
+
             if ($request->has('delete_images') && count($request->delete_images) > 0) {
                 foreach ($request->delete_images as $deleteImageID) {
                     $image = ImageProduct::where(['id' => $deleteImageID, 'product_id' => $product->id])->first();

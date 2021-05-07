@@ -28,7 +28,7 @@ class CategoryFactory extends Factory
         return [
             'name'      => $name,
             'slug'      => Str::slug($name),
-            'image'     => '/storage/hinh-anh/danh-muc/' . $number . '/' . Str::slug($name) . '.png',
+            'image'     => 'https://picsum.photos/200',
             'home'      => rand(0, 1),
             'sort_no'   => $number++
         ];
