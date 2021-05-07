@@ -265,7 +265,7 @@ class ColorController extends Controller
     {
         try {
             $condition = $request->all();
-            $fileName = 'mau-sac-' . now()->format('dmY-his') . '.xlsx';
+            $fileName = 'mau-sac-' . now()->format('d-m-Y-his') . '.xlsx';
 
             return $this->excel->download(new ColorExport($condition), $fileName);
         } catch (Exception $exception) {

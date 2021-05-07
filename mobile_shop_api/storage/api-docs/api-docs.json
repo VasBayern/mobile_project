@@ -718,11 +718,11 @@
                                     },
                                     "home": {
                                         "description": "Show in homepage => 0: False, 1: True",
-                                        "type": "integer",
+                                        "type": "string",
                                         "default": "0",
                                         "enum": [
-                                            0,
-                                            1
+                                            "0",
+                                            "1"
                                         ]
                                     },
                                     "image": {
@@ -849,10 +849,11 @@
                                     },
                                     "home": {
                                         "description": "Show in homepage => 0: False, 1: True",
-                                        "type": "integer",
+                                        "type": "string",
+                                        "default": "0",
                                         "enum": [
-                                            0,
-                                            1
+                                            "0",
+                                            "1"
                                         ]
                                     },
                                     "image": {
@@ -1188,11 +1189,11 @@
                                     },
                                     "home": {
                                         "description": "Show in homepage => 0: False, 1: True",
-                                        "type": "integer",
+                                        "type": "string",
                                         "default": "0",
                                         "enum": [
-                                            0,
-                                            1
+                                            "0",
+                                            "1"
                                         ]
                                     },
                                     "image": {
@@ -1319,10 +1320,11 @@
                                     },
                                     "home": {
                                         "description": "Show in homepage => 0: False, 1: True",
-                                        "type": "integer",
+                                        "type": "string",
+                                        "default": "0",
                                         "enum": [
-                                            0,
-                                            1
+                                            "0",
+                                            "1"
                                         ]
                                     },
                                     "image": {
@@ -1942,6 +1944,592 @@
                 "responses": {
                     "200": {
                         "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/products": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Get All Product",
+                "operationId": "getProducts",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "sort by column: 0-id, 1-name, 2-price_core, 3-price, 4-sort_no, 5-home, 6-new, 7-created_at",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort by order: 0-ASC, 1-DESC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "sort by paginate page: 0-10, 1-25, 2-50, 3-100",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "start date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "end date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "search by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Add Product With Form Data",
+                "operationId": "storeProduct",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "category_id",
+                                    "brand_id",
+                                    "price_core",
+                                    "price",
+                                    "sort_no",
+                                    "home",
+                                    "new",
+                                    "images",
+                                    "introduction",
+                                    "additional_incentives",
+                                    "description",
+                                    "specification"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "category_id": {
+                                        "type": "integer"
+                                    },
+                                    "brand_id": {
+                                        "type": "integer"
+                                    },
+                                    "price_core": {
+                                        "type": "number",
+                                        "multipleOf": 1000
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "multipleOf": 1000
+                                    },
+                                    "sort_no": {
+                                        "type": "integer",
+                                        "default": 0
+                                    },
+                                    "home": {
+                                        "description": "Show in homepage => 0: False, 1: True",
+                                        "type": "string",
+                                        "default": "0",
+                                        "enum": [
+                                            "0",
+                                            "1"
+                                        ]
+                                    },
+                                    "new": {
+                                        "description": "New product => 0: False, 1: True",
+                                        "type": "string",
+                                        "default": "0",
+                                        "enum": [
+                                            "0",
+                                            "1"
+                                        ]
+                                    },
+                                    "introduction": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "additional_incentives": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "specification": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "images[]": {
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Find Product By ID",
+                "operationId": "showProduct",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Update Product With Form Data",
+                "operationId": "updateProduct",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "category_id",
+                                    "brand_id",
+                                    "price_core",
+                                    "price",
+                                    "sort_no",
+                                    "home",
+                                    "new",
+                                    "introduction",
+                                    "additional_incentives",
+                                    "description",
+                                    "specification",
+                                    "_method"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "category_id": {
+                                        "type": "integer"
+                                    },
+                                    "brand_id": {
+                                        "type": "integer"
+                                    },
+                                    "price_core": {
+                                        "type": "number",
+                                        "multipleOf": 1000
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "multipleOf": 1000
+                                    },
+                                    "sort_no": {
+                                        "type": "integer",
+                                        "default": 0
+                                    },
+                                    "home": {
+                                        "description": "Show in homepage => 0: False, 1: True",
+                                        "type": "string",
+                                        "default": "0",
+                                        "enum": [
+                                            "0",
+                                            "1"
+                                        ]
+                                    },
+                                    "new": {
+                                        "description": "New product => 0: False, 1: True",
+                                        "type": "string",
+                                        "default": "0",
+                                        "enum": [
+                                            "0",
+                                            "1"
+                                        ]
+                                    },
+                                    "introduction": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "additional_incentives": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "specification": {
+                                        "type": "string",
+                                        "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                                    },
+                                    "images[]": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "file"
+                                        }
+                                    },
+                                    "delete_images[]": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "_method": {
+                                        "type": "string",
+                                        "default": "PUT"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Delete Product By ID",
+                "operationId": "destroyProduct",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/products/excel/export": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Export Excel Product",
+                "operationId": "exportProduct",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "sort by column: 0-id, 1-name, 2-price_core, 3-price, 4-sort_no, 5-home, 6-new, 7-created_at",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort by order: 0-ASC, 1-DESC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "sort by paginate page: 0-10, 1-25, 2-50, 3-100",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "default": "0",
+                            "enum": [
+                                0,
+                                1,
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "start date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "end date to filter (dd/mm/yyyy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "search by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "400": {
                         "description": "Bad Request"
@@ -2908,6 +3496,78 @@
                     "name": "Color"
                 }
             },
+            "Product": {
+                "title": "Product",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "1"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "iPhone 12 Pro Max 64GB"
+                    },
+                    "category_id": {
+                        "$ref": "#/components/schemas/Category"
+                    },
+                    "brand_id": {
+                        "$ref": "#/components/schemas/Brand"
+                    },
+                    "price_core": {
+                        "type": "number",
+                        "multipleOf": 1000,
+                        "example": 300000
+                    },
+                    "price": {
+                        "type": "number",
+                        "multipleOf": 1000,
+                        "example": 250000
+                    },
+                    "sort_no": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "home": {
+                        "description": "Show in homepage => 0: False, 1: True",
+                        "type": "integer",
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "example": "0"
+                    },
+                    "new": {
+                        "description": "New product => 0: False, 1: True",
+                        "type": "integer",
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "example": "0"
+                    },
+                    "introduction": {
+                        "type": "string",
+                        "example": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                    },
+                    "additional_incentives": {
+                        "type": "string",
+                        "example": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                    },
+                    "specification": {
+                        "type": "string",
+                        "example": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "Product"
+                }
+            },
             "Ram": {
                 "title": "Ram",
                 "properties": {
@@ -3024,6 +3684,9 @@
         },
         {
             "name": "Color"
+        },
+        {
+            "name": "Product"
         },
         {
             "name": "Ram"

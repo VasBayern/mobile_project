@@ -91,7 +91,7 @@ class BrandController extends Controller
      *              required={"name", "home", "sort_no", "image"},
      *              @OA\Property(property="name", type="string"),
      *              @OA\Property(property="sort_no", type="integer", default="0"),
-     *              @OA\Property(property="home", type="integer", default="0", enum={0, 1}, description="Show in homepage => 0: False, 1: True",),
+     *              @OA\Property(property="home", type="string", default="0", enum={"0", "1"}, description="Show in homepage => 0: False, 1: True",),
      *              @OA\Property(property="image", type="file",),
      *          )
      *      )
@@ -178,7 +178,7 @@ class BrandController extends Controller
      *              required={"name", "home", "sort_no", "_method"},
      *              @OA\Property(property="name", type="string"),
      *              @OA\Property(property="sort_no", type="integer", default="0"),
-     *              @OA\Property(property="home", type="integer", enum={0, 1}, description="Show in homepage => 0: False, 1: True"),
+     *              @OA\Property(property="home", type="string", default="0", enum={"0", "1"}, description="Show in homepage => 0: False, 1: True",),
      *              @OA\Property(property="image", type="file"),
      *              @OA\Property(property="_method", type="string", default="PUT"),
      *          )
@@ -216,6 +216,7 @@ class BrandController extends Controller
             $brand->update($request->all());
 
             if ($request->hasFile('image')) {
+                $this->removeImageDirectory($directory);
                 $brand->image = $this->handleUploadImage($directory, $request->name, $request->image);
             } else {
                 $brand->image = $this->renameStorageImage($directory, $brandName, $brandImage, $request->name);
@@ -292,7 +293,7 @@ class BrandController extends Controller
     {
         try {
             $condition = $request->all();
-            $fileName = 'hang-san-xuat-' . now()->format('dmY-his') . '.xlsx';
+            $fileName = 'hang-san-xuat-' . now()->format('d-m-Y-his') . '.xlsx';
 
             return $this->excel->download(new BrandMultiSheetExport($condition), $fileName);
         } catch (Exception $exception) {

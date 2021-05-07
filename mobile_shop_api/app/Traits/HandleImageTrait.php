@@ -33,8 +33,6 @@ trait HandleImageTrait
      */
     protected function handleUploadImage($directory, $name, $image)
     {
-        $this->removeImageDirectory($directory);
-
         $nameImage = Str::slug($name) . '.' . $image->extension();
         $pathImage = Storage::putFileAs($directory, $image, $nameImage);
 
@@ -74,6 +72,22 @@ trait HandleImageTrait
     {
         if (Storage::exists($directory)) {
             Storage::deleteDirectory($directory);
+        }
+    }
+
+    /**
+     * Remove image folder when delete item
+     * 
+     * @param  string $directory
+     */
+    protected function removeImageFile($directory, $file)
+    {
+        $arrayPathImage = explode('/', $file);
+        $nameImage = end($arrayPathImage);
+        $pathImage = $directory . '/' . $nameImage;
+        
+        if (Storage::exists($pathImage)) {
+            Storage::delete($pathImage);
         }
     }
 }

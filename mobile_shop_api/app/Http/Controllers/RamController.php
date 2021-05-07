@@ -261,7 +261,7 @@ class RamController extends Controller
     {
         try {
             $condition = $request->all();
-            $fileName = 'bo-nho-' . now()->format('dmY-his') . '.xlsx';
+            $fileName = 'bo-nho-' . now()->format('d-m-Y-his') . '.xlsx';
 
             return $this->excel->download(new RamExport($condition), $fileName);
         } catch (Exception $exception) {
