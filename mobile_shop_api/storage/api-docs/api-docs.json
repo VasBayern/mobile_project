@@ -2345,7 +2345,7 @@
                                     "delete_images[]": {
                                         "type": "array",
                                         "items": {
-                                            "type": "object"
+                                            "type": "string"
                                         }
                                     },
                                     "_method": {
