@@ -112,7 +112,7 @@ class ProductController extends Controller
      *              @OA\Property(property="additional_incentives", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
      *              @OA\Property(property="description", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
      *              @OA\Property(property="specification", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
-     *              @OA\Property(property="images[]", type="array", items={"type": "string", "format"="binary"}),
+     *              @OA\Property(property="images[]", type="file"),
      *          )
      *      )
      *  ),
@@ -135,22 +135,10 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
+        return response()->json(count($request->file('images')));
         DB::beginTransaction();
         try {
             $product = Product::create($request->all());
-
-            if ($request->hasFile('images')) {
-                $directory = Product::DIRECTORY_PATH . $product->id;
-                foreach ($request->file('images') as $key => $file) {
-                    $imageName = $key == 0 ? $request->name : $request->name . '-' . $key;
-                    $path = $this->handleUploadImage($directory, $imageName, $file);
-
-                    ImageProduct::create([
-                        'product_id' => $product->id,
-                        'path' => $path
-                    ]);
-                }
-            }
             DB::commit();
 
             return $this->respondWithResource(new ProductDetailResource($product), 'Thêm thành công', 201);
@@ -236,9 +224,9 @@ class ProductController extends Controller
      *              @OA\Property(property="additional_incentives", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
      *              @OA\Property(property="description", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
      *              @OA\Property(property="specification", type="string", default="Lorem Ipsum is simply dummy text of the printing and typesetting industry"),
+     *              @OA\Property(property="images[]", type="array", items={"type": "file"}),
+     *              @OA\Property(property="delete_images[]", type="array", items={"type": "string"}),
      *              @OA\Property(property="_method", type="string", default="PUT"),
-     *              
-     *              @OA\Property(property="delete_images", type="array", items={"type": "string"}),
      *          )
      *      )
      *  ),
@@ -264,7 +252,50 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             $product = Product::findOrFail($id);
+            $productSlug = $product->slug;
             $product->update($request->all());
+
+            $directory = Product::DIRECTORY_PATH . $id;
+            return response()->json(($request->delete_images));
+            return response()->json(count($request->delete_images));
+            if ($request->has('delete_images') && count($request->delete_images) > 0) {
+                foreach ($request->delete_images as $deleteImageID) {
+                    $image = ImageProduct::where(['id' => $deleteImageID, 'product_id' => $product->id])->first();
+                    if (!$image) {
+                        return $this->respondNotFound(null, 'Ảnh ' . $deleteImageID . ' không tồn tại');
+                    }
+                    $this->removeImageFile($directory, $image->path);
+                    $image->delete();
+                }
+            }
+
+            $imageIDs = ImageProduct::where('product_id', $id)->pluck('id');
+
+            if ($product->slug != $productSlug) {
+                foreach ($imageIDs as $imageID) {
+                    $image = ImageProduct::where('id', $imageID)->first();
+                    $oldPath = $image->path;
+                    $image->path = $this->renameStorageImage($directory, $productSlug, $oldPath, $product->slug);
+                    $image->save();
+                }
+            }
+
+            if ($request->hasFile('images')) {
+                $lastPath = ImageProduct::where('product_id', $id)->orderBy('id', 'desc')->pluck('path')->first();
+                $path = array_slice(explode('/', $lastPath), -1)[0];
+                $namePath = array_slice(explode('.', $path), 0, 1)[0];
+                $key = array_slice(explode('-', $namePath), -1)[0];
+
+                foreach ($request->file('images') as $file) {
+                    $imageName = $product->slug . '-' . ($key + 1);
+                    $imagePath = $this->handleUploadImage($directory, $imageName, $file);
+                    ImageProduct::create([
+                        'product_id' => $id,
+                        'path' => $imagePath
+                    ]);
+                    $key++;
+                }
+            }
 
             DB::commit();
 
@@ -302,9 +333,6 @@ class ProductController extends Controller
     {
         try {
             $product = Product::findOrFail($id);
-            $directory = Product::DIRECTORY_PATH . $id;
-            $this->removeImageDirectory($directory);
-
             $product->delete();
 
             return $this->respondSuccess('Xoá thành công');

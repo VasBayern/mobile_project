@@ -74,4 +74,20 @@ trait HandleImageTrait
             Storage::deleteDirectory($directory);
         }
     }
+
+    /**
+     * Remove image folder when delete item
+     * 
+     * @param  string $directory
+     */
+    protected function removeImageFile($directory, $file)
+    {
+        $arrayPathImage = explode('/', $file);
+        $nameImage = end($arrayPathImage);
+        $pathImage = $directory . '/' . $nameImage;
+        
+        if (Storage::exists($pathImage)) {
+            Storage::delete($pathImage);
+        }
+    }
 }

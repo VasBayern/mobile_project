@@ -28,6 +28,7 @@ class ProductDetailResource extends JsonResource
             'additional_incentives' => $this->additional_incentives,
             'description'   => $this->description,
             'specification' => $this->specification,
+            'images'        => ImageProductResource::collection($this->images),
         ];
     }
 }

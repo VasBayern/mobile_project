@@ -2158,11 +2158,7 @@
                                         "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
                                     },
                                     "images[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
+                                        "type": "file"
                                     }
                                 },
                                 "type": "object"
@@ -2340,15 +2336,21 @@
                                         "type": "string",
                                         "default": "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
                                     },
+                                    "images[]": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "file"
+                                        }
+                                    },
+                                    "delete_images[]": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object"
+                                        }
+                                    },
                                     "_method": {
                                         "type": "string",
                                         "default": "PUT"
-                                    },
-                                    "delete_images": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
                                     }
                                 },
                                 "type": "object"

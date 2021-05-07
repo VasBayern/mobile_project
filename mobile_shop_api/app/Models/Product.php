@@ -96,4 +96,12 @@ class Product extends Model
     {
         return $this->belongsTo(Brand::class);
     }
+
+    /**
+     * Get the images for the product
+     */
+    public function images()
+    {
+        return $this->hasMany(ImageProduct::class);
+    }
 }
